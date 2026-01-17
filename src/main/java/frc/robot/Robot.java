@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -31,14 +32,20 @@ public class Robot extends TimedRobot {
   private SparkMax motorFR = new SparkMax(31, MotorType.kBrushless);
   private SparkMax motorBL = new SparkMax(33, MotorType.kBrushless);
   private SparkMax motorBR = new SparkMax(30, MotorType.kBrushless);
+  private SparkMax motorShooter = new SparkMax(12, MotorType.kBrushless);
+  private SparkMax motorIntake = new SparkMax(13, MotorType.kBrushless);
+  
 
   private SparkMaxConfig motorFLConfig = new SparkMaxConfig();
   private SparkMaxConfig motorFRConfig = new SparkMaxConfig();
   private SparkMaxConfig motorBLConfig = new SparkMaxConfig();
   private SparkMaxConfig motorBRConfig = new SparkMaxConfig();
+  private SparkMaxConfig motorShooterConfig = new SparkMaxConfig();
+  private SparkMaxConfig motorIntakeConfig = new SparkMaxConfig();
 
   private Joystick joyStickL = new Joystick(0);
   private Joystick joyStickR = new Joystick(1);
+  private XboxController xboxController = new XboxController(2);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -49,11 +56,20 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    final int currentLimit = 40;
     // Invert motors
-    motorFLConfig.inverted(true);
-    motorBLConfig.inverted(true);
-    motorFRConfig.inverted(false);
-    motorBRConfig.inverted(false);
+    motorFLConfig.inverted(true)
+      .smartCurrentLimit(currentLimit);
+    motorBLConfig.inverted(true)
+      .smartCurrentLimit(currentLimit);
+    motorFRConfig.inverted(false)
+     .smartCurrentLimit(currentLimit);
+    motorBRConfig.inverted(false)
+     .smartCurrentLimit(currentLimit);
+    motorIntakeConfig.inverted(true)
+      .smartCurrentLimit(currentLimit);
+    motorShooterConfig.inverted(false)
+      .smartCurrentLimit(currentLimit);
 
     motorBLConfig.follow(32);
     motorBRConfig.follow(31);
@@ -62,6 +78,8 @@ public class Robot extends TimedRobot {
     motorFR.configure(motorFRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motorBL.configure(motorBLConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motorBR.configure(motorBRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorIntake.configure(motorIntakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorShooter.configure(motorShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
   }
@@ -121,6 +139,31 @@ public class Robot extends TimedRobot {
 
     double rightJoyStickImput = joyStickR.getY();
     motorFR.set(rightJoyStickImput / 2);
+
+    if (xboxController.getAButton()) {
+      motorShooter.set(0.75);
+    }
+    else {
+      motorShooter.set(0);
+    }
+
+    if (xboxController.getBButton()) {
+      motorShooter.set(0.4);
+    }
+    else {
+      motorShooter.set(0);
+    }
+
+    if (xboxController.getXButton()) {
+      motorIntake.set(0.4);
+    }
+    else {
+      motorIntake.set(0);
+    }
+
+
+
+    
 
 
   }
