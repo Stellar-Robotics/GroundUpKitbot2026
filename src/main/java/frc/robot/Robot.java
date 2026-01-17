@@ -4,6 +4,13 @@
 
 package frc.robot;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +26,20 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+
+  private SparkMax motorFL = new SparkMax(32, MotorType.kBrushless);
+  private SparkMax motorFR = new SparkMax(31, MotorType.kBrushless);
+  private SparkMax motorBL = new SparkMax(33, MotorType.kBrushless);
+  private SparkMax motorBR = new SparkMax(30, MotorType.kBrushless);
+
+  private SparkMaxConfig motorFLConfig = new SparkMaxConfig();
+  private SparkMaxConfig motorFRConfig = new SparkMaxConfig();
+  private SparkMaxConfig motorBLConfig = new SparkMaxConfig();
+  private SparkMaxConfig motorBRConfig = new SparkMaxConfig();
+
+  private Joystick joyStickL = new Joystick(0);
+  private Joystick joyStickR = new Joystick(1);
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -27,6 +48,22 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    // Invert motors
+    motorFLConfig.inverted(true);
+    motorBLConfig.inverted(true);
+    motorFRConfig.inverted(false);
+    motorBRConfig.inverted(false);
+
+    motorBLConfig.follow(32);
+    motorBRConfig.follow(31);
+
+    motorFL.configure(motorFLConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorFR.configure(motorFRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorBL.configure(motorBLConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorBR.configure(motorBRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
   }
 
   /**
@@ -38,6 +75,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {}
+
+  
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -76,7 +115,15 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    double leftJoyStickImput = joyStickL.getY();
+    motorFL.set(leftJoyStickImput / 2);
+
+    double rightJoyStickImput = joyStickR.getY();
+    motorFR.set(rightJoyStickImput / 2);
+
+
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
