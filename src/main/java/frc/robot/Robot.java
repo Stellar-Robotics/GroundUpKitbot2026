@@ -81,6 +81,8 @@ public class Robot extends TimedRobot {
     motorIntake.configure(motorIntakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motorShooter.configure(motorShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    SmartDashboard.putNumber("shooter speed", 0.5);
+
 
   }
 
@@ -134,6 +136,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+
+    double shooterSpeed = SmartDashboard.getNumber("shooter speed", 0.75);
+
     double leftJoyStickImput = joyStickL.getY();
     motorFL.set(leftJoyStickImput / 2);
 
@@ -141,7 +146,7 @@ public class Robot extends TimedRobot {
     motorFR.set(rightJoyStickImput / 2);
 
     if (xboxController.getAButton()) {
-      motorShooter.set(0.75);
+      motorShooter.set(shooterSpeed);
     }
     else {
       motorShooter.set(0);
