@@ -153,14 +153,14 @@ public class Robot extends TimedRobot {
     }
 
     if (xboxController.getBButton()) {
-      motorShooter.set(0.4);
+      motorShooter.set(.75);
     }
     else {
       motorShooter.set(0);
     }
 
     if (xboxController.getXButton()) {
-      motorIntake.set(0.4);
+      motorIntake.set(.5);
     }
     else {
       motorIntake.set(0);
