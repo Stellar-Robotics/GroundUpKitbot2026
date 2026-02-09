@@ -22,12 +22,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
+
+  // Template auto selector
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-
+  // Create motor objects
   private SparkMax motorFL = new SparkMax(32, MotorType.kBrushless);
   private SparkMax motorFR = new SparkMax(31, MotorType.kBrushless);
   private SparkMax motorBL = new SparkMax(33, MotorType.kBrushless);
@@ -35,7 +37,7 @@ public class Robot extends TimedRobot {
   private SparkMax motorShooter = new SparkMax(12, MotorType.kBrushless);
   private SparkMax motorIntake = new SparkMax(13, MotorType.kBrushless);
   
-
+  // Create motor config objects
   private SparkMaxConfig motorFLConfig = new SparkMaxConfig();
   private SparkMaxConfig motorFRConfig = new SparkMaxConfig();
   private SparkMaxConfig motorBLConfig = new SparkMaxConfig();
@@ -43,6 +45,7 @@ public class Robot extends TimedRobot {
   private SparkMaxConfig motorShooterConfig = new SparkMaxConfig();
   private SparkMaxConfig motorIntakeConfig = new SparkMaxConfig();
 
+  // Create controller objects
   private Joystick joyStickL = new Joystick(0);
   private Joystick joyStickR = new Joystick(1);
   private XboxController xboxController = new XboxController(2);
@@ -52,12 +55,20 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
+
+    // Publish template auto chooser
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    final int currentLimit = 40;
-    // Invert motors
+
+
+    // Call various setter methods on the config objects
+    // to modify out configuration objects
+
+    final int currentLimit = 40; // Store the common current limit in a variable
+
+    // Invert motors and set the current limit with our variable
     motorFLConfig.inverted(true)
       .smartCurrentLimit(currentLimit);
     motorBLConfig.inverted(true)
@@ -71,9 +82,12 @@ public class Robot extends TimedRobot {
     motorShooterConfig.inverted(false)
       .smartCurrentLimit(currentLimit);
 
+    // Make sure that the back drive motors mimic their corresponding from motor
     motorBLConfig.follow(32);
     motorBRConfig.follow(31);
 
+    // Apply the configuration objects to the motors using the motor's "configure" method.
+    // We'll want our motor controllers to both reset safe parameters and persist the other parameters.
     motorFL.configure(motorFLConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motorFR.configure(motorFRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motorBL.configure(motorBLConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -81,6 +95,7 @@ public class Robot extends TimedRobot {
     motorIntake.configure(motorIntakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motorShooter.configure(motorShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    // Create a dashboard entry for the shooter speed so we can adjust it on the fly
     SmartDashboard.putNumber("shooter speed", 0.5);
 
 
@@ -133,18 +148,27 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {}
 
-  /** This function is called periodically during operator control. */
+  /** This function is called periodically (every 20ms) during operator control. */
   @Override
   public void teleopPeriodic() {
 
+    // Update our shooter speed from the dashboard and store it in a variable
     double shooterSpeed = SmartDashboard.getNumber("shooter speed", 0.75);
 
+    // Set the speed of our motors to correspond to the joystick movement.
+    // 1. Store the input of the joystick in a variable.
+    // 2. Use the set method to set the motor speed (use the joystick variable values).
+    // 3. Divide the joystick input arguement by 2 to cut the effective speed in half.
     double leftJoyStickImput = joyStickL.getY();
     motorFL.set(leftJoyStickImput / 2);
 
     double rightJoyStickImput = joyStickR.getY();
     motorFR.set(rightJoyStickImput / 2);
 
+
+    // Check if the 'A' button is actively being pressed.
+    // -> Run the shooter if true
+    // -> Stop the shooter if false
     if (xboxController.getAButton()) {
       motorShooter.set(shooterSpeed);
     }
@@ -152,6 +176,7 @@ public class Robot extends TimedRobot {
       motorShooter.set(0);
     }
 
+    // Set other binds in a similar way the one above
     if (xboxController.getBButton()) {
       motorShooter.set(.75);
     }
@@ -165,12 +190,6 @@ public class Robot extends TimedRobot {
     else {
       motorIntake.set(0);
     }
-
-
-
-    
-
-
   }
 
   /** This function is called once when the robot is disabled. */
