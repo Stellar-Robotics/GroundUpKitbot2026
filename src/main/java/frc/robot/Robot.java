@@ -4,17 +4,9 @@
 
 package frc.robot;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -22,83 +14,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
+  private Command m_autonomousCommand;
 
-  // Template auto selector
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-  // Create motor objects
-  private SparkMax motorFL = new SparkMax(32, MotorType.kBrushless);
-  private SparkMax motorFR = new SparkMax(31, MotorType.kBrushless);
-  private SparkMax motorBL = new SparkMax(33, MotorType.kBrushless);
-  private SparkMax motorBR = new SparkMax(30, MotorType.kBrushless);
-  private SparkMax motorShooter = new SparkMax(12, MotorType.kBrushless);
-  private SparkMax motorIntake = new SparkMax(13, MotorType.kBrushless);
-  
-  // Create motor config objects
-  private SparkMaxConfig motorFLConfig = new SparkMaxConfig();
-  private SparkMaxConfig motorFRConfig = new SparkMaxConfig();
-  private SparkMaxConfig motorBLConfig = new SparkMaxConfig();
-  private SparkMaxConfig motorBRConfig = new SparkMaxConfig();
-  private SparkMaxConfig motorShooterConfig = new SparkMaxConfig();
-  private SparkMaxConfig motorIntakeConfig = new SparkMaxConfig();
-
-  // Create controller objects
-  private Joystick joyStickL = new Joystick(0);
-  private Joystick joyStickR = new Joystick(1);
-  private XboxController xboxController = new XboxController(2);
+  private final RobotContainer m_robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-
-    // Publish template auto chooser
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-
-
-
-    // Call various setter methods on the config objects
-    // to modify out configuration objects
-
-    final int currentLimit = 40; // Store the common current limit in a variable
-
-    // Invert motors and set the current limit with our variable
-    motorFLConfig.inverted(true)
-      .smartCurrentLimit(currentLimit);
-    motorBLConfig.inverted(true)
-      .smartCurrentLimit(currentLimit);
-    motorFRConfig.inverted(false)
-     .smartCurrentLimit(currentLimit);
-    motorBRConfig.inverted(false)
-     .smartCurrentLimit(currentLimit);
-    motorIntakeConfig.inverted(true)
-      .smartCurrentLimit(currentLimit);
-    motorShooterConfig.inverted(false)
-      .smartCurrentLimit(currentLimit);
-
-    // Make sure that the back drive motors mimic their corresponding from motor
-    motorBLConfig.follow(32);
-    motorBRConfig.follow(31);
-
-    // Apply the configuration objects to the motors using the motor's "configure" method.
-    // We'll want our motor controllers to both reset safe parameters and persist the other parameters.
-    motorFL.configure(motorFLConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorFR.configure(motorFRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorBL.configure(motorBLConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorBR.configure(motorBRConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorIntake.configure(motorIntakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorShooter.configure(motorShooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    // Create a dashboard entry for the shooter speed so we can adjust it on the fly
-    SmartDashboard.putNumber("shooter speed", 0.5);
-
-
+    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+    // autonomous chooser on the dashboard.
+    m_robotContainer = new RobotContainer();
   }
 
   /**
@@ -109,100 +36,56 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
+    // commands, running already-scheduled commands, removing finished or interrupted commands,
+    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // block in order for anything in the Command-based framework to work.
+    CommandScheduler.getInstance().run();
+  }
 
-  
+  /** This function is called once each time the robot enters Disabled mode. */
+  @Override
+  public void disabledInit() {}
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
-   * below with additional strings. If using the SendableChooser make sure to add them to the
-   * chooser code above as well.
-   */
+  @Override
+  public void disabledPeriodic() {}
+
+  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(m_autonomousCommand);
+    }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+  public void autonomousPeriodic() {}
+
+  @Override
+  public void teleopInit() {
+    // This makes sure that the autonomous stops running when
+    // teleop starts running. If you want the autonomous to
+    // continue until interrupted by another command, remove
+    // this line or comment it out.
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
     }
   }
 
-  /** This function is called once when teleop is enabled. */
+  /** This function is called periodically during operator control. */
   @Override
-  public void teleopInit() {}
+  public void teleopPeriodic() {}
 
-  /** This function is called periodically (every 20ms) during operator control. */
   @Override
-  public void teleopPeriodic() {
-
-    // Update our shooter speed from the dashboard and store it in a variable
-    double shooterSpeed = SmartDashboard.getNumber("shooter speed", 0.75);
-
-    // Set the speed of our motors to correspond to the joystick movement.
-    // 1. Store the input of the joystick in a variable.
-    // 2. Use the set method to set the motor speed (use the joystick variable values).
-    // 3. Divide the joystick input arguement by 2 to cut the effective speed in half.
-    double leftJoyStickImput = joyStickL.getY();
-    motorFL.set(leftJoyStickImput / 2);
-
-    double rightJoyStickImput = joyStickR.getY();
-    motorFR.set(rightJoyStickImput / 2);
-
-
-    // Check if the 'A' button is actively being pressed.
-    // -> Run the shooter if true
-    // -> Stop the shooter if false
-    if (xboxController.getAButton()) {
-      motorShooter.set(shooterSpeed);
-    }
-    else {
-      motorShooter.set(0);
-    }
-
-    // Set other binds in a similar way the one above
-    if (xboxController.getBButton()) {
-      motorShooter.set(.75);
-    }
-    else {
-      motorShooter.set(0);
-    }
-
-    if (xboxController.getXButton()) {
-      motorIntake.set(.5);
-    }
-    else {
-      motorIntake.set(0);
-    }
+  public void testInit() {
+    // Cancels all running commands at the start of test mode.
+    CommandScheduler.getInstance().cancelAll();
   }
-
-  /** This function is called once when the robot is disabled. */
-  @Override
-  public void disabledInit() {}
-
-  /** This function is called periodically when disabled. */
-  @Override
-  public void disabledPeriodic() {}
-
-  /** This function is called once when test mode is enabled. */
-  @Override
-  public void testInit() {}
 
   /** This function is called periodically during test mode. */
   @Override
