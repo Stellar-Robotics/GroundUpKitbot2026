@@ -10,7 +10,11 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.MotorConstants;
 
 public class FuelSubsystem extends SubsystemBase {
 
@@ -22,31 +26,51 @@ public class FuelSubsystem extends SubsystemBase {
     SparkMaxConfig dualFuelMotorConfig = new SparkMaxConfig();
     SparkMaxConfig weeeMotorConfig = new SparkMaxConfig();
 
-    dualFuelMotorConfig.smartCurrentLimit(60).inverted(false);
-    weeeMotorConfig.smartCurrentLimit(60).inverted(false);
+    dualFuelMotorConfig.smartCurrentLimit(MotorConstants.currentLimit).inverted(false);
+    weeeMotorConfig.smartCurrentLimit(MotorConstants.currentLimit).inverted(false);
 
 
     weeeMotor.configure(weeeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     dualFuelMotor.configure(dualFuelMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
-
-
   
-  public void intake() {
-    dualFuelMotor.setVoltage(8.0);
+
+  public Command intakeStuff() {
+
+    Command intakeStuff = runEnd(()->{
+    dualFuelMotor.setVoltage(5);
+    weeeMotor.setVoltage(5);
+    },()->{
+    dualFuelMotor.setVoltage(0);
+    weeeMotor.setVoltage(0);
+
+    }
+    );
+    return intakeStuff;
   }
 
-  public void stopIntake() {
-    dualFuelMotor.setVoltage(.0);
+    public Command shootStuff() {
+
+      Command SpinUpShooter = runOnce(() -> {
+        dualFuelMotor.setVoltage(8);
+      });
+
+      Command runWeeeMotor = run(() -> {
+        weeeMotor.setVoltage(-8);
+      });
+
+      Command commandSeq = new SequentialCommandGroup(
+        SpinUpShooter,
+        new WaitCommand(1),
+        runWeeeMotor
+      ).handleInterrupt(() -> {
+        dualFuelMotor.setVoltage(0);
+        weeeMotor.setVoltage(0);
+      });
+
+    return commandSeq;
   }
 
-  public void otherIntake(double intakeSpeed) {
-    weeeMotor.setVoltage(intakeSpeed);
-  }
-
-  public void stopOtherIntake() {
-    weeeMotor.setVoltage(.0);
-  }
 
   @Override
   public void periodic() {

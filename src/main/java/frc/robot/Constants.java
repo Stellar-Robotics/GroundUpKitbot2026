@@ -15,5 +15,15 @@ package frc.robot;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    
+  }
+
+  public static class MotorConstants {
+    public static final int currentLimit = 40;
+    public static final int bLCanID = 33;
+    public static final int fRCanID = 31;
+    public static final int fLCanID = 32;
+    public static final int bRCanID = 30;
+
   }
 }

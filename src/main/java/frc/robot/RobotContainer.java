@@ -4,10 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.FuelSubsystem;
 
 /**
@@ -19,9 +21,12 @@ import frc.robot.subsystems.FuelSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
+  Drive zoomZoom = new Drive();
+   // Replace with CommandPS4Controller or CommandJoystick if needed
   CommandXboxController operatorController = new CommandXboxController(2);
+  Joystick leftJoystick = new Joystick(0);
+  Joystick righJoystick = new Joystick(1);
+  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -39,67 +44,24 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-
-    Runnable startIntakeCode = () -> {
-      ultimateDodgeBallMachine.intake();
-    };
-
-    Runnable stopIntakeCode = () -> {
-      ultimateDodgeBallMachine.stopIntake();
-    };
-
-    Command intakeCommand = ultimateDodgeBallMachine.runEnd(startIntakeCode, stopIntakeCode);
-
-    
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true
 
 
-
-
-
-    Runnable startOtherIntakeCode = () -> {
-      ultimateDodgeBallMachine.otherIntake(0.8);
-    };
-
-    Runnable stopOtherIntakeCode = () -> {
-      ultimateDodgeBallMachine.stopOtherIntake();
-    };
-
-    Command intakeOtherCommand = ultimateDodgeBallMachine.runEnd(startOtherIntakeCode, stopOtherIntakeCode);
-
-    
-
-    
-    
-    
-    
-    
-    
-    Runnable reverseStartOtherIntakeCode = () -> {
-      ultimateDodgeBallMachine.otherIntake(-0.8);
-    };
-
-    Runnable reverseStopOtherIntakeCode = () -> {
-      ultimateDodgeBallMachine.stopOtherIntake();
-    };
-
-    Command reverseIntakeOtherCommand = ultimateDodgeBallMachine.runEnd(reverseStartOtherIntakeCode, reverseStopOtherIntakeCode);
-
-    operatorController.x().whileTrue(
-      new ParallelCommandGroup(
-        reverseIntakeOtherCommand,
-        intakeCommand
-      )
+    //this shoots
+    operatorController.rightTrigger().whileTrue(
+      ultimateDodgeBallMachine.shootStuff()
     );
 
-    operatorController.x().whileTrue(
-      new ParallelCommandGroup(
-        intakeOtherCommand,
-        intakeCommand
-      )
-    );
+    //this intakes
+    operatorController.leftBumper().whileTrue(
+      ultimateDodgeBallMachine.intakeStuff()
+      );
+    
 
-
+    zoomZoom.setDefaultCommand(zoomZoom.driveTank(
+      () -> leftJoystick.getY(),
+      () -> righJoystick.getY()
+    ));
 
 
   }
