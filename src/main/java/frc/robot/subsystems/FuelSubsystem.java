@@ -15,12 +15,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class FuelSubsystem extends SubsystemBase {
 
   SparkMax dualFuelMotor = new SparkMax(12, MotorType.kBrushless);
+  SparkMax weeeMotor = new SparkMax(13, MotorType.kBrushless);
 
   /** Creates a new FuelSubsystem. */
   public FuelSubsystem() {
     SparkMaxConfig dualFuelMotorConfig = new SparkMaxConfig();
+    SparkMaxConfig weeeMotorConfig = new SparkMaxConfig();
 
-    dualFuelMotorConfig.smartCurrentLimit(60);
+    dualFuelMotorConfig.smartCurrentLimit(60).inverted(false);
+    weeeMotorConfig.smartCurrentLimit(60).inverted(false);
+
+
+    weeeMotor.configure(weeeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     dualFuelMotor.configure(dualFuelMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
@@ -30,8 +36,16 @@ public class FuelSubsystem extends SubsystemBase {
     dualFuelMotor.setVoltage(8.0);
   }
 
-  public void StopIntake() {
+  public void stopIntake() {
     dualFuelMotor.setVoltage(.0);
+  }
+
+  public void otherIntake(double intakeSpeed) {
+    weeeMotor.setVoltage(intakeSpeed);
+  }
+
+  public void stopOtherIntake() {
+    weeeMotor.setVoltage(.0);
   }
 
   @Override
