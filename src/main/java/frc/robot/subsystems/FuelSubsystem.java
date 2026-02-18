@@ -49,6 +49,21 @@ public class FuelSubsystem extends SubsystemBase {
     return intakeStuff;
   }
 
+
+  public Command dropStuff() {
+
+    Command dropStuff = runEnd(()->{
+    dualFuelMotor.setVoltage(-5);
+    weeeMotor.setVoltage(-5);
+    },()->{
+    dualFuelMotor.setVoltage(0);
+    weeeMotor.setVoltage(0);
+
+    }
+    );
+    return dropStuff;
+  }
+
     public Command shootStuff() {
 
       Command SpinUpShooter = runOnce(() -> {
