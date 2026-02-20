@@ -4,11 +4,16 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.MotorConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
 
@@ -16,6 +21,7 @@ public class ClimberSubsystem extends SubsystemBase {
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
   Solenoid extensionSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
+  SparkMax ClimberMotor = new SparkMax(MotorConstants.climberCanID, MotorType.kBrushless);
   Solenoid lockSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 2);
 
   //use set to turn on with bolean
@@ -25,6 +31,29 @@ public class ClimberSubsystem extends SubsystemBase {
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
   }
+
+  boolean lock = true;
+  
+  public Command lock() {
+    Command lockCommand = runOnce(()->{
+      lock = !lock;
+      lockSolenoid.set(lock);
+    }
+    );
+    return lockCommand;
+  }
+
+  boolean extend = true;
+  
+  public Command extend() {
+    Command extendCommand = runOnce(()->{
+      extend = !extend;
+      extensionSolenoid.set(extend);
+    }
+    );
+    return extendCommand;
+  }
+
 
   @Override
   public void periodic() {

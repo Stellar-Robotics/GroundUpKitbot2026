@@ -24,6 +24,7 @@ public final class Constants {
     public static final int fRCanID = 31;
     public static final int fLCanID = 32;
     public static final int bRCanID = 30;
+    public static final int climberCanID = 0;                        //change this
 
   }
 }
