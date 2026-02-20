@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -60,13 +63,12 @@ public class RobotContainer {
     operatorController.rightBumper().whileTrue(
       ultimateDodgeBallMachine.dropStuff()
     );
-    
+
+    Supplier<Double> leftJoystickInputFilter = () -> MathUtil.applyDeadband(leftJoystick.getY(), .15);
+    Supplier<Double> rightJoystickInputFilter = () -> MathUtil.applyDeadband(righJoystick.getY(), .15);
 
     //this goes zoom zoom
-    zoomZoom.setDefaultCommand(zoomZoom.driveTank(
-      () -> leftJoystick.getY(),
-      () -> righJoystick.getY()
-    ));
+    zoomZoom.setDefaultCommand( zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter) );
 
 
   }
