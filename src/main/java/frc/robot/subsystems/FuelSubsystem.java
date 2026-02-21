@@ -73,9 +73,16 @@ public class FuelSubsystem extends SubsystemBase {
       Command runWeeeMotor = run(() -> {
         weeeMotor.setVoltage(-8);
       });
+      
+
+      Command rnWeeeMotor = runOnce(()->{
+        weeeMotor.setVoltage(8);
+      }
+      );
 
       Command commandSeq = new SequentialCommandGroup(
         SpinUpShooter,
+        rnWeeeMotor,
         new WaitCommand(1),
         runWeeeMotor
       ).handleInterrupt(() -> {
