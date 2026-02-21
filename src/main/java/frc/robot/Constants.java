@@ -27,4 +27,13 @@ public final class Constants {
     public static final int climberCanID = 0;                        //change this
 
   }
+
+  public static class ClimberConstants {
+    public static final int firstClimb = 0;                          //change this
+    public static final int secondClimb = 0;                         //change this
+    public static final int thirdClimb = 0;                          //change this
+    public static final boolean unlocked = true;                     //change this???
+
+
+  }
 }

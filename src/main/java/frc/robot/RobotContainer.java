@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.FuelSubsystem;
 
@@ -23,6 +24,7 @@ import frc.robot.subsystems.FuelSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
+  ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   Drive zoomZoom = new Drive();
    // Replace with CommandPS4Controller or CommandJoystick if needed
   CommandXboxController operatorController = new CommandXboxController(2);
@@ -48,7 +50,6 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true
 
-
     //this shoots
     operatorController.rightTrigger().whileTrue(
       ultimateDodgeBallMachine.shootStuff()
@@ -62,6 +63,14 @@ public class RobotContainer {
     //this drops
     operatorController.rightBumper().whileTrue(
       ultimateDodgeBallMachine.dropStuff()
+    );
+
+    operatorController.back().onTrue(
+      climberSubsystem.finalClimberingSequence()
+    );
+
+    operatorController.start().onTrue(
+      climberSubsystem.extend()
     );
 
     Supplier<Double> leftJoystickInputFilter = () -> MathUtil.applyDeadband(leftJoystick.getY(), .15);
