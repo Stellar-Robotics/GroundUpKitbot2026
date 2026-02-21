@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -28,14 +29,19 @@ public class ClimberSubsystem extends SubsystemBase {
   PneumaticHub revHub = new PneumaticHub(18);
   Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
 
+
+  //this extends the climbing device
+  //off/false is retracted
   Solenoid extensionSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
+
+  //this motor is the motor that does the climbing
   SparkMax climberMotor = new SparkMax(MotorConstants.climberCanID, MotorType.kBrushless);
   SparkClosedLoopController ClimberCLC = climberMotor.getClosedLoopController();
+
+  //this motor locks the climber in place after compleating the climb to each rung
+  //off/false is locked
   Solenoid lockSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 2);
 
-  //use set to turn on with bolean
-  //off is locked for lock
-  //off is retracted for extension
 
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
@@ -43,13 +49,13 @@ public class ClimberSubsystem extends SubsystemBase {
     
     climberMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
     .inverted(false)
-    .closedLoop.pid(0, 0, 0);
+    .closedLoop.pid(0, 0, 0);                                        //change these
 
     climberMotor.configure(climberMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters );
   }
 
   
-  
+  //creates a command to toggle the locking motor
   public Command lock() {
     Command lockCommand = runOnce(()->{
       lockSolenoid.toggle();
@@ -58,8 +64,7 @@ public class ClimberSubsystem extends SubsystemBase {
     return lockCommand;
   }
 
-  boolean extend = true;
-  
+  //creates a command to toggle the extendsion motor
   public Command extend() {
     Command extendCommand = runOnce(()->{
       extensionSolenoid.toggle();
@@ -68,6 +73,7 @@ public class ClimberSubsystem extends SubsystemBase {
     return extendCommand;
   }
 
+  //creates a command to set the position of the climbing motor
   public Command activateClimbingMotor(double climberSetPoint) {
     double clampedClimberSetPoint = MathUtil.clamp(
       climberSetPoint,
@@ -82,6 +88,7 @@ public class ClimberSubsystem extends SubsystemBase {
     return activateClimbingMotor;
   }
 
+  //creates a command to climb one rung of the latter
   public Command oneClimberSequence(double iSuckAtNamingStuff){
     Command oneClimberSequence = runOnce(()->{
       activateClimbingMotor(iSuckAtNamingStuff);
@@ -92,15 +99,19 @@ public class ClimberSubsystem extends SubsystemBase {
     return oneClimberSequence;
   }
 
+  //creates a command to do the full climb at the end of teleop
   public Command finalClimberingSequence(){
 
     Command finalClimberingSequence = runOnce(()->{
       lockSolenoid.set(ClimberConstants.unlocked);
       oneClimberSequence(ClimberConstants.firstClimb);
+      lockSolenoid.set(ClimberConstants.unlocked);
       oneClimberSequence(ClimberConstants.secondClimb);
+      lockSolenoid.set(ClimberConstants.unlocked);
       oneClimberSequence(ClimberConstants.thirdClimb);
     }
-    );
+    //this is a safe gaurd so this command won't run unless the extension is extended
+    ).onlyIf(()->extensionSolenoid.get() == true);
 
 
     return finalClimberingSequence;
