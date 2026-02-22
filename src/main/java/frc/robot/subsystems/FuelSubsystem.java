@@ -19,18 +19,18 @@ import frc.robot.Constants.MotorConstants;
 public class FuelSubsystem extends SubsystemBase {
 
   SparkMax dualFuelMotor = new SparkMax(12, MotorType.kBrushless);
-  SparkMax weeeMotor = new SparkMax(13, MotorType.kBrushless);
+  SparkMax kickerMotor = new SparkMax(13, MotorType.kBrushless);
 
   /** Creates a new FuelSubsystem. */
   public FuelSubsystem() {
     SparkMaxConfig dualFuelMotorConfig = new SparkMaxConfig();
-    SparkMaxConfig weeeMotorConfig = new SparkMaxConfig();
+    SparkMaxConfig kickerMotorConfig = new SparkMaxConfig();
 
     dualFuelMotorConfig.smartCurrentLimit(MotorConstants.currentLimit).inverted(false);
-    weeeMotorConfig.smartCurrentLimit(MotorConstants.currentLimit).inverted(false);
+    kickerMotorConfig.smartCurrentLimit(MotorConstants.currentLimit).inverted(false);
 
 
-    weeeMotor.configure(weeeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    kickerMotor.configure(kickerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     dualFuelMotor.configure(dualFuelMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
   
@@ -39,10 +39,10 @@ public class FuelSubsystem extends SubsystemBase {
 
     Command intakeStuff = runEnd(()->{
     dualFuelMotor.setVoltage(5);
-    weeeMotor.setVoltage(5);
+    kickerMotor.setVoltage(5);
     },()->{
     dualFuelMotor.setVoltage(0);
-    weeeMotor.setVoltage(0);
+    kickerMotor.setVoltage(0);
 
     }
     );
@@ -54,10 +54,10 @@ public class FuelSubsystem extends SubsystemBase {
 
     Command dropStuff = runEnd(()->{
     dualFuelMotor.setVoltage(-5);
-    weeeMotor.setVoltage(-5);
+    kickerMotor.setVoltage(-5);
     },()->{
     dualFuelMotor.setVoltage(0);
-    weeeMotor.setVoltage(0);
+    kickerMotor.setVoltage(0);
 
     }
     );
@@ -71,12 +71,12 @@ public class FuelSubsystem extends SubsystemBase {
       });
 
       Command runWeeeMotor = run(() -> {
-        weeeMotor.setVoltage(-8);
+        kickerMotor.setVoltage(-8);
       });
-      
+
 
       Command rnWeeeMotor = runOnce(()->{
-        weeeMotor.setVoltage(8);
+        kickerMotor.setVoltage(8);
       }
       );
 
@@ -87,7 +87,7 @@ public class FuelSubsystem extends SubsystemBase {
         runWeeeMotor
       ).handleInterrupt(() -> {
         dualFuelMotor.setVoltage(0);
-        weeeMotor.setVoltage(0);
+        kickerMotor.setVoltage(0);
       });
 
     return commandSeq;

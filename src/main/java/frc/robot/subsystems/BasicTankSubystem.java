@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
-public class Drive extends SubsystemBase {
+public class BasicTankSubystem extends SubsystemBase {
   
   SparkMax tankFLMotor = new SparkMax(MotorConstants.fLCanID, MotorType.kBrushless);
   SparkMax tankFRMotor = new SparkMax(MotorConstants.fRCanID, MotorType.kBrushless);
@@ -25,7 +25,7 @@ public class Drive extends SubsystemBase {
   SparkMax tankBRMotor = new SparkMax(MotorConstants.bRCanID, MotorType.kBrushless);
 
 
-  public Drive() {
+  public BasicTankSubystem() {
     
   SparkMaxConfig tankFLMotorConfig = new SparkMaxConfig();
   SparkMaxConfig tankFRMotorConfig = new SparkMaxConfig();

@@ -36,4 +36,10 @@ public final class Constants {
 
 
   }
+
+  public static class tankConstants {
+    public static final double RotationsInAMeter = 0;
+
+
+  }
 }
