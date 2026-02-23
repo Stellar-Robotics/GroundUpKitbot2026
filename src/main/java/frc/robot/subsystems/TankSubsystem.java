@@ -7,7 +7,9 @@ package frc.robot.subsystems;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPLTVController;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -16,6 +18,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +27,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.tankConstants;
@@ -34,6 +39,8 @@ public class TankSubsystem extends SubsystemBase {
   SparkMax tankFRMotor = new SparkMax(MotorConstants.fRCanID, MotorType.kBrushless);
   SparkMax tankBLMotor = new SparkMax(MotorConstants.bLCanID, MotorType.kBrushless);
   SparkMax tankBRMotor = new SparkMax(MotorConstants.bRCanID, MotorType.kBrushless);
+
+  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 0);
   
   ADIS16470_IMU gyro = new ADIS16470_IMU();
 
@@ -104,18 +111,30 @@ public class TankSubsystem extends SubsystemBase {
     }
 
     // AutoBuilder.configure(
-    //   () -> poseEstimator.getEstimatedPosition(), 
-    //   (poseReset) -> poseEstimator.resetPose(poseReset), 
-    //   null, 
-    //   null, 
-    //   null, 
-    //   config, 
-    //   null, 
-    //   null
-    // );
+    //    () -> poseEstimator.getEstimatedPosition(), 
+    //    (poseReset) -> poseEstimator.resetPose(poseReset), 
+    //    () -> convertToChassisSpeeds(frontLeftCLC.getSetpoint(), frontRightCLC.getSetpoint()), 
+    //    (ChassisSpeeds, feedForward.calculate()) -> chassisDrive(ChassisSpeeds),
+    //    new PPLTVController(0), 
+    //    config, 
+    //    () -> {
+    //     //checks to see if we are on the red alliance, if so the path will be flipped
+    //     var alliance = DriverStation.getAlliance();
+    //       if (alliance.isPresent()) {
+    //         return alliance.get() == DriverStation.Alliance.Red;
+    //       }
+    //       else {
+    //       return false;
+    //       }
+    //     }, 
+    //     this
+    //  );
 
   }
 
+  public Command getAutonmousCommand() {
+    return new PathPlannerAuto("PUT AUTO NAME HERE");
+  }
 
   @Override
   public void periodic() {
