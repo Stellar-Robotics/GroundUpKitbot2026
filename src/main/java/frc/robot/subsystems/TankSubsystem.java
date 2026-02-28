@@ -28,6 +28,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
@@ -40,6 +42,8 @@ public class TankSubsystem extends SubsystemBase {
   SparkMax tankBLMotor = new SparkMax(MotorConstants.bLCanID, MotorType.kBrushless);
   SparkMax tankBRMotor = new SparkMax(MotorConstants.bRCanID, MotorType.kBrushless);
 
+  Field2d field = new Field2d();
+
   
   
   ADIS16470_IMU gyro = new ADIS16470_IMU();
@@ -48,10 +52,10 @@ public class TankSubsystem extends SubsystemBase {
 
   DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
     kinematics, 
-    new Rotation2d(gyro.getAngle()), 
-    tankFLMotor.getEncoder().getVelocity(), 
-    tankFRMotor.getEncoder().getVelocity(), 
-    new Pose2d()
+    Rotation2d.fromDegrees(gyro.getAngle()), 
+    -tankFLMotor.getEncoder().getPosition(), 
+    -tankFRMotor.getEncoder().getPosition(), 
+    new Pose2d(0, 5, Rotation2d.fromDegrees(0))
   );
 
   SparkClosedLoopController frontLeftCLC = tankFLMotor.getClosedLoopController();
@@ -64,11 +68,9 @@ public class TankSubsystem extends SubsystemBase {
     SparkMaxConfig tankBRMotorConfig = new SparkMaxConfig();
 
     tankFLMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
-      .inverted(true)
-      .encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
+      .inverted(true);
     tankFRMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
-      .inverted(false)
-      .encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
+      .inverted(false);
     tankBLMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
       .inverted(true)
       .follow(MotorConstants.fLCanID);
@@ -76,8 +78,8 @@ public class TankSubsystem extends SubsystemBase {
       .inverted(false)
       .follow(MotorConstants.fRCanID);
 
-    tankFLMotorConfig.encoder.positionConversionFactor(tankConstants.RotationsInAMeter);
-    tankFLMotorConfig.encoder.positionConversionFactor(tankConstants.RotationsInAMeter);
+    tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
+    tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
     tankFLMotorConfig.closedLoop.pid(0.01, 0, 0);
     tankFRMotorConfig.closedLoop.pid(0.01, 0, 0);
 
@@ -87,6 +89,8 @@ public class TankSubsystem extends SubsystemBase {
     tankFRMotor.configure(tankFRMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     configurePathPlanner();
+    gyro.reset();
+    gyro.calibrate();
   }
 
   public void chassisDrive(ChassisSpeeds chassisSpeedSupplier) {
@@ -152,10 +156,14 @@ public class TankSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    poseEstimator.update(new Rotation2d(
-      gyro.getAngle()), 
-      tankFLMotor.getEncoder().getVelocity(), 
-      tankFRMotor.getEncoder().getVelocity()
+    poseEstimator.update(
+      Rotation2d.fromDegrees(gyro.getAngle()), 
+      -tankFLMotor.getEncoder().getPosition(), 
+      -tankFRMotor.getEncoder().getPosition()
     );
+
+    field.setRobotPose(poseEstimator.getEstimatedPosition());
+    SmartDashboard.putData("Field", field);
+    SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
   }
 }
