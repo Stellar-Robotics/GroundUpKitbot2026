@@ -6,13 +6,17 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ClimberSubsystem;
-import frc.robot.subsystems.BasicTankSubystem;
+import frc.robot.subsystems.TankSubsystem;
 import frc.robot.subsystems.FuelSubsystem;
 
 /**
@@ -25,18 +29,22 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
   ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-  BasicTankSubystem zoomZoom = new BasicTankSubystem();
+  TankSubsystem zoomZoom = new TankSubsystem();
    // Replace with CommandPS4Controller or CommandJoystick if needed
   CommandXboxController operatorController = new CommandXboxController(2);
   Joystick leftJoystick = new Joystick(0);
   Joystick righJoystick = new Joystick(1);
+
+  SendableChooser<Command> autoChooser;
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-    getAutonomousCommand();
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Select Auto", autoChooser);
   }
 
   /**
@@ -80,7 +88,7 @@ public class RobotContainer {
     Supplier<Double> rightJoystickInputFilter = () -> MathUtil.applyDeadband(righJoystick.getY(), .15);
 
     //this goes zoom zoom
-    zoomZoom.setDefaultCommand( zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter) );
+    zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter));
 
 
   }
@@ -94,6 +102,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return new Command() {};
+    return autoChooser.getSelected();
   }
 }

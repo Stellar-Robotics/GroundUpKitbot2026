@@ -39,8 +39,6 @@ public final class Constants {
   }
 
   public static class tankConstants {
-    public static final double RotationsInAMeter = 0;
-
-
+    public static final double RotationsInAMeter = 22.369415248865;
   }
 }

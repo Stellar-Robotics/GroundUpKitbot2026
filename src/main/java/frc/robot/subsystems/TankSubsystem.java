@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 
+import java.util.function.Supplier;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.RobotConfig;
@@ -62,9 +64,11 @@ public class TankSubsystem extends SubsystemBase {
     SparkMaxConfig tankBRMotorConfig = new SparkMaxConfig();
 
     tankFLMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
-      .inverted(true);
+      .inverted(true)
+      .encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
     tankFRMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
-      .inverted(false);
+      .inverted(false)
+      .encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
     tankBLMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
       .inverted(true)
       .follow(MotorConstants.fLCanID);
@@ -81,6 +85,8 @@ public class TankSubsystem extends SubsystemBase {
     tankBRMotor.configure(tankBRMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     tankFLMotor.configure(tankFLMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     tankFRMotor.configure(tankFRMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    configurePathPlanner();
   }
 
   public void chassisDrive(ChassisSpeeds chassisSpeedSupplier) {
@@ -103,24 +109,17 @@ public class TankSubsystem extends SubsystemBase {
 
     try{
       config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-      config = new RobotConfig(60, 3, null, null);
-    }
 
-
-
-    AutoBuilder.configure(
-       () -> poseEstimator.getEstimatedPosition(), 
-       (poseReset) -> poseEstimator.resetPose(poseReset), 
-       () -> convertToChassisSpeeds(frontLeftCLC.getSetpoint(), frontRightCLC.getSetpoint()), 
-       (ChassisSpeeds) -> chassisDrive(ChassisSpeeds),
-       new PPLTVController(0), 
-       config, 
-       () -> {
-        //checks to see if we are on the red alliance, if so the path will be flipped
-        var alliance = DriverStation.getAlliance();
+      AutoBuilder.configure(
+        () -> poseEstimator.getEstimatedPosition(), 
+        (poseReset) -> poseEstimator.resetPose(poseReset), 
+        () -> convertToChassisSpeeds(tankFLMotor.getEncoder().getVelocity(), tankFRMotor.getEncoder().getVelocity()), 
+        (chassisSpeeds, feedForwards) -> chassisDrive(chassisSpeeds),
+        new PPLTVController(0), 
+        config, 
+        () -> {
+          //checks to see if we are on the red alliance, if so the path will be flipped
+          var alliance = DriverStation.getAlliance();
           if (alliance.isPresent()) {
             return alliance.get() == DriverStation.Alliance.Red;
           }
@@ -128,9 +127,23 @@ public class TankSubsystem extends SubsystemBase {
           return false;
           }
         }, 
-        this
-     );
+          this
+      );
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
 
+  }
+
+  public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed) {
+
+    Command driveCommand = run(() -> {
+      tankFRMotor.set(rightSpeed.get());
+      tankFLMotor.set(leftSpeed.get());
+    });
+
+    return driveCommand;
   }
 
   public Command getAutonmousCommand() {
