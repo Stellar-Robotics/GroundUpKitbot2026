@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 
+import java.util.function.Supplier;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -19,7 +21,9 @@ import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.MotorConstants;
 
@@ -42,6 +46,7 @@ public class ClimberSubsystem extends SubsystemBase {
   //off/false is locked
   Solenoid lockSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 2);
 
+  Supplier<Double> climberPosition = ()-> climberMotor.getEncoder().getPosition();
 
   /** Creates a new ClimberSubsystem. */
   public ClimberSubsystem() {
@@ -90,14 +95,15 @@ public class ClimberSubsystem extends SubsystemBase {
 
   //creates a command to climb one rung of the latter
   public Command oneClimberSequence(double iSuckAtNamingStuff){
-    Command oneClimberSequence = runOnce(()->{
-      climbCommand(iSuckAtNamingStuff);
-      lock();
-      climbCommand(-iSuckAtNamingStuff);
-    }
+    Command oneClimberSequence = new SequentialCommandGroup(
+      climbCommand(iSuckAtNamingStuff),
+      new WaitUntilCommand(()-> climberPosition.get() >= iSuckAtNamingStuff),
+      lock(),
+      climbCommand(-iSuckAtNamingStuff)
     );
     return oneClimberSequence;
   }
+
 
   //creates a command to do the full climb at the end of teleop
   public Command finalClimberingSequence(){
@@ -119,19 +125,20 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public Command autoClimbingSeqCommand() {
     Command autoClimbingSeqCommand = runOnce(()->{
-      lockSolenoid.set(true);          //unlocks locking thingy
+      lockSolenoid.set(ClimberConstants.unlocked);                 //unlocks locking thingy
       extend();
       climbCommand(ClimberConstants.autoClimb);
       lockSolenoid.set(false);
-
     }
     );
+    
     return autoClimbingSeqCommand;
   }
 
   public Command endOfAutoClimb() {
     Command endOfAutoClimb = runOnce(()->{
       climbCommand(ClimberConstants.autoClimb);
+      new WaitUntilCommand(()-> climberPosition.get() >= ClimberConstants.autoClimb);
       lockSolenoid.set(ClimberConstants.unlocked);
       extensionSolenoid.set(false);   
     }
