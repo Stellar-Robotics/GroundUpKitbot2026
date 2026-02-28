@@ -74,7 +74,7 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   //creates a command to set the position of the climbing motor
-  public Command activateClimbingMotor(double climberSetPoint) {
+  public Command climbCommand(double climberSetPoint) {
     double clampedClimberSetPoint = MathUtil.clamp(
       climberSetPoint,
       0,
@@ -91,9 +91,9 @@ public class ClimberSubsystem extends SubsystemBase {
   //creates a command to climb one rung of the latter
   public Command oneClimberSequence(double iSuckAtNamingStuff){
     Command oneClimberSequence = runOnce(()->{
-      activateClimbingMotor(iSuckAtNamingStuff);
+      climbCommand(iSuckAtNamingStuff);
       lock();
-      activateClimbingMotor(-iSuckAtNamingStuff);
+      climbCommand(-iSuckAtNamingStuff);
     }
     );
     return oneClimberSequence;
@@ -115,6 +115,28 @@ public class ClimberSubsystem extends SubsystemBase {
 
 
     return finalClimberingSequence;
+  }
+
+  public Command autoClimbingSeqCommand() {
+    Command autoClimbingSeqCommand = runOnce(()->{
+      lockSolenoid.set(true);          //unlocks locking thingy
+      extend();
+      climbCommand(ClimberConstants.autoClimb);
+      lockSolenoid.set(false);
+
+    }
+    );
+    return autoClimbingSeqCommand;
+  }
+
+  public Command endOfAutoClimb() {
+    Command endOfAutoClimb = runOnce(()->{
+      climbCommand(ClimberConstants.autoClimb);
+      lockSolenoid.set(ClimberConstants.unlocked);
+      extensionSolenoid.set(false);   
+    }
+    );
+    return endOfAutoClimb;
   }
 
 

@@ -32,7 +32,8 @@ public final class Constants {
     public static final int firstClimb = 0;                          //change this
     public static final int secondClimb = 0;                         //change this
     public static final int thirdClimb = 0;                          //change this
-    public static final boolean unlocked = true;                     //change this???
+    public static final boolean unlocked = true;                     
+    public static final double autoClimb = 0;                        //change this
 
 
   }

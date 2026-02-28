@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPLTVController;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -40,7 +41,7 @@ public class TankSubsystem extends SubsystemBase {
   SparkMax tankBLMotor = new SparkMax(MotorConstants.bLCanID, MotorType.kBrushless);
   SparkMax tankBRMotor = new SparkMax(MotorConstants.bRCanID, MotorType.kBrushless);
 
-  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 0);
+  
   
   ADIS16470_IMU gyro = new ADIS16470_IMU();
 
@@ -85,7 +86,7 @@ public class TankSubsystem extends SubsystemBase {
     tankFRMotor.configure(tankFRMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void chassisDrive(Supplier<ChassisSpeeds> chassisSpeedSupplier) {
+  public void chassisDrive(Object chassisSpeedSupplier) {
 
     DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeedSupplier.get());
 
@@ -100,7 +101,7 @@ public class TankSubsystem extends SubsystemBase {
   }
 
   public void configurePathPlanner() {
-
+    
     RobotConfig config;
 
     try{
@@ -108,27 +109,30 @@ public class TankSubsystem extends SubsystemBase {
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
+      config = new RobotConfig(60, 3, null, null);
     }
 
-    // AutoBuilder.configure(
-    //    () -> poseEstimator.getEstimatedPosition(), 
-    //    (poseReset) -> poseEstimator.resetPose(poseReset), 
-    //    () -> convertToChassisSpeeds(frontLeftCLC.getSetpoint(), frontRightCLC.getSetpoint()), 
-    //    (ChassisSpeeds, feedForward.calculate()) -> chassisDrive(ChassisSpeeds),
-    //    new PPLTVController(0), 
-    //    config, 
-    //    () -> {
-    //     //checks to see if we are on the red alliance, if so the path will be flipped
-    //     var alliance = DriverStation.getAlliance();
-    //       if (alliance.isPresent()) {
-    //         return alliance.get() == DriverStation.Alliance.Red;
-    //       }
-    //       else {
-    //       return false;
-    //       }
-    //     }, 
-    //     this
-    //  );
+
+
+    AutoBuilder.configure(
+       () -> poseEstimator.getEstimatedPosition(), 
+       (poseReset) -> poseEstimator.resetPose(poseReset), 
+       () -> convertToChassisSpeeds(frontLeftCLC.getSetpoint(), frontRightCLC.getSetpoint()), 
+       (ChassisSpeeds) -> chassisDrive(ChassisSpeeds),
+       new PPLTVController(0), 
+       config, 
+       () -> {
+        //checks to see if we are on the red alliance, if so the path will be flipped
+        var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          else {
+          return false;
+          }
+        }, 
+        this
+     );
 
   }
 
