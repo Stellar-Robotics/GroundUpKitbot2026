@@ -61,12 +61,20 @@ public class ClimberSubsystem extends SubsystemBase {
 
   
   //creates a command to toggle the locking motor
-  public Command lock() {
+  public Command toggleLock() {
     Command lockCommand = runOnce(()->{
       lockSolenoid.toggle();
     }
     );
     return lockCommand;
+  }
+
+  public Command setLock (boolean lock) {
+    Command setLock = runOnce(()->{
+      lockSolenoid.set(lock);
+    }
+    );
+    return setLock;
   }
 
   //creates a command to toggle the extendsion motor
@@ -98,8 +106,9 @@ public class ClimberSubsystem extends SubsystemBase {
     Command oneClimberSequence = new SequentialCommandGroup(
       climbCommand(iSuckAtNamingStuff),
       new WaitUntilCommand(()-> climberPosition.get() >= iSuckAtNamingStuff),
-      lock(),
-      climbCommand(-iSuckAtNamingStuff)
+      toggleLock(),
+      climbCommand(-iSuckAtNamingStuff),
+      new WaitUntilCommand(()-> climberPosition.get() <= iSuckAtNamingStuff)
     );
     return oneClimberSequence;
   }
@@ -109,6 +118,7 @@ public class ClimberSubsystem extends SubsystemBase {
   public Command finalClimberingSequence(){
 
     Command finalClimberingSequence = runOnce(()->{
+      extensionSolenoid.set(true);                   //ask operator about this
       lockSolenoid.set(ClimberConstants.unlocked);
       oneClimberSequence(ClimberConstants.firstClimb);
       lockSolenoid.set(ClimberConstants.unlocked);
@@ -124,14 +134,13 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public Command autoClimbingSeqCommand() {
-    Command autoClimbingSeqCommand = runOnce(()->{
-      lockSolenoid.set(ClimberConstants.unlocked);                 //unlocks locking thingy
-      extend();
-      climbCommand(ClimberConstants.autoClimb);
-      lockSolenoid.set(false);
-    }
+    Command autoClimbingSeqCommand = new SequentialCommandGroup(
+      setLock(ClimberConstants.unlocked),                 //unlocks locking thingy
+      extend(),
+      climbCommand(ClimberConstants.autoClimb),
+      new WaitUntilCommand(()-> climberPosition.get() >= ClimberConstants.autoClimb),
+      setLock(ClimberConstants.locked)
     );
-    
     return autoClimbingSeqCommand;
   }
 
@@ -140,7 +149,7 @@ public class ClimberSubsystem extends SubsystemBase {
       climbCommand(ClimberConstants.autoClimb);
       new WaitUntilCommand(()-> climberPosition.get() >= ClimberConstants.autoClimb);
       lockSolenoid.set(ClimberConstants.unlocked);
-      extensionSolenoid.set(false);   
+      extensionSolenoid.set(ClimberConstants.locked);   
     }
     );
     return endOfAutoClimb;
