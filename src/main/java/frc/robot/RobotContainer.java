@@ -88,7 +88,7 @@ public class RobotContainer {
     Supplier<Double> rightJoystickInputFilter = () -> MathUtil.applyDeadband(righJoystick.getY(), .15);
 
     //this goes zoom zoom
-    zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter));
+    zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter, true));
 
 
   }

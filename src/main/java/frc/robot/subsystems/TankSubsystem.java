@@ -19,6 +19,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -140,11 +141,16 @@ public class TankSubsystem extends SubsystemBase {
 
   }
 
-  public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed) {
+  public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed, boolean squareInputs) {
 
     Command driveCommand = run(() -> {
-      tankFRMotor.set(rightSpeed.get());
-      tankFLMotor.set(leftSpeed.get());
+      if (squareInputs) { // Optionally square inputs (finer control at lower speeds)
+        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2));
+        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2));
+      } else {
+        tankFRMotor.set(rightSpeed.get());
+        tankFLMotor.set(leftSpeed.get());
+      }
     });
 
     return driveCommand;
