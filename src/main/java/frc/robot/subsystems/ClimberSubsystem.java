@@ -17,9 +17,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,12 +32,14 @@ import frc.robot.Constants.MotorConstants;
 public class ClimberSubsystem extends SubsystemBase {
 
   PneumaticHub revHub = new PneumaticHub(18);
-  Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+  Compressor compressor = revHub.makeCompressor();
 
 
   //this extends the climbing device
   //off/false is retracted
-  Solenoid extensionSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
+  //Solenoid extensionSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
+  DoubleSolenoid extensionSolenoid = revHub.makeDoubleSolenoid(0, 1);
+
 
   //this motor is the motor that does the climbing
   SparkMax climberMotor = new SparkMax(MotorConstants.climberCanID, MotorType.kBrushless);
@@ -44,7 +47,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
   //this motor locks the climber in place after compleating the climb to each rung
   //off/false is locked
-  Solenoid lockSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 2);
+  Solenoid lockSolenoid = revHub.makeSolenoid(2);
 
   Supplier<Double> climberPosition = ()-> climberMotor.getEncoder().getPosition();
 
@@ -118,7 +121,7 @@ public class ClimberSubsystem extends SubsystemBase {
   public Command finalClimberingSequence(){
 
     Command finalClimberingSequence = runOnce(()->{
-      extensionSolenoid.set(true);                   //ask operator about this
+      extensionSolenoid.set(Value.kForward);                   //ask operator about this
       lockSolenoid.set(ClimberConstants.unlocked);
       oneClimberSequence(ClimberConstants.firstClimb);
       lockSolenoid.set(ClimberConstants.unlocked);
@@ -127,7 +130,7 @@ public class ClimberSubsystem extends SubsystemBase {
       oneClimberSequence(ClimberConstants.thirdClimb);
     }
     //this is a safe gaurd so this command won't run unless the extension is extended
-    ).onlyIf(()->extensionSolenoid.get() == true);
+    ).onlyIf(()-> extensionSolenoid.get() == Value.kForward);
 
 
     return finalClimberingSequence;
@@ -149,7 +152,7 @@ public class ClimberSubsystem extends SubsystemBase {
       climbCommand(ClimberConstants.autoClimb);
       new WaitUntilCommand(()-> climberPosition.get() >= ClimberConstants.autoClimb);
       lockSolenoid.set(ClimberConstants.unlocked);
-      extensionSolenoid.set(ClimberConstants.locked);   
+      extensionSolenoid.set(ClimberConstants.locked ? Value.kForward : Value.kReverse);   
     }
     );
     return endOfAutoClimb;
