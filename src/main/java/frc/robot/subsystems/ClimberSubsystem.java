@@ -38,7 +38,7 @@ public class ClimberSubsystem extends SubsystemBase {
   //this extends the climbing device
   //off/false is retracted
   //Solenoid extensionSolenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
-  DoubleSolenoid extensionSolenoid = revHub.makeDoubleSolenoid(14, 15);
+  DoubleSolenoid extensionSolenoid = revHub.makeDoubleSolenoid(15, 14);
 
 
   //this motor is the motor that does the climbing
