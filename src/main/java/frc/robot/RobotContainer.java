@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.TankSubsystem;
 import frc.robot.subsystems.FuelSubsystem;
 import frc.robot.subsystems.Lights;
@@ -57,6 +56,17 @@ public class RobotContainer {
     lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
     lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
     lightChooser.addOption("rainbow", lights.rainbow());
+    lightChooser.addOption("red", lights.red());
+    lightChooser.addOption("orange", lights.orange());
+    lightChooser.addOption("yellow", lights.yellow());
+    lightChooser.addOption("green", lights.green());
+    lightChooser.addOption("blue", lights.blue());
+    lightChooser.addOption("purple", lights.purple());
+    lightChooser.addOption("white", lights.white());
+    lightChooser.addOption("black", lights.black());
+    lightChooser.addOption("red white and blue", lights.USAAAAAA());
+    lightChooser.addOption("monochromatic", lights.monochromatic());
+
     SmartDashboard.putData("select lights", lightChooser);
 
     lights.setDefaultCommand(lights.run(() -> {

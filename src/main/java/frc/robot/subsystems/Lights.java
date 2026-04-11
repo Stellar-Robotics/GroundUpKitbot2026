@@ -54,23 +54,81 @@ public class Lights extends SubsystemBase {
 
   public Command rainbow() {
     Command lights = run(() -> {
-      blinker(0.57, 2);
-      blinker(0.63, 2);
-      blinker(0.69, 2);
-      blinker(0.73, 2);
-      blinker(0.77, 2);
-      blinker(0.81, 2);
-      blinker(0.87, 2);
-      blinker(0.91, 2);
+      blinker(0.57, 2);//redish
+      blinker(0.63, 2);//orange
+      blinker(0.69, 2);//yellow
+      blinker(0.73, 2);//lime green
+      blinker(0.77, 2);//green
+      blinker(0.81, 2);//aqua
+      blinker(0.87, 2);//blue
+      blinker(0.91, 2);//violet
     }
     );
     return lights;
   }
 
+  //all of the Commands below are just solid colors
+  public Command red() {
+    return runOnce(() -> light.set(0.61));
+  }
+
+  public Command orange() {
+    return runOnce(() -> light.set(0.63));
+  }
+
+  public Command yellow() {
+    return runOnce(() -> light.set(0.69));
+  }
+
+  public Command green() {
+    return runOnce(() -> light.set(0.77));
+  }
+
+  public Command blue() {
+    return runOnce(() -> light.set(0.87));
+  }
+
+  public Command purple() {
+    return runOnce(() -> light.set(0.91));
+  }
+
+  public Command white() {
+    return runOnce(() -> light.set(0.93));
+  }
+
+  public Command black() {
+    return runOnce(() -> light.set(0.99));
+  }
+
+
+
+  public Command USAAAAAA() {
+    Command lights = runOnce(() -> {
+      blinker(0.93, 3);//white
+      blinker(0.61, 3);//red
+      blinker(0.87, 3);//blue
+    }
+    );
+    return lights;
+  }
+
+  public Command monochromatic() {
+    Command lights = runOnce(() -> {
+      blinker(0.93, 2);
+      blinker(0.95, 1);
+      blinker(0.97, 1);
+      blinker(0.99, 2);
+      blinker(0.97, 1);
+      blinker(0.95, 1);
+    }
+    );
+    return lights;
+  }
 
   
 
-  
+
+
 
   @Override
   public void periodic() {
