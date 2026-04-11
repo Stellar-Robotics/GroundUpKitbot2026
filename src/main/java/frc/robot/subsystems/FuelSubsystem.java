@@ -38,8 +38,8 @@ public class FuelSubsystem extends SubsystemBase {
   public Command intakeStuff() {
 
     Command intakeStuff = runEnd(()->{
-    dualFuelMotor.setVoltage(5);
-    kickerMotor.setVoltage(5);
+    dualFuelMotor.setVoltage(7);
+    kickerMotor.setVoltage(7);
     },()->{
     dualFuelMotor.setVoltage(0);
     kickerMotor.setVoltage(0);

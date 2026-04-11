@@ -13,11 +13,13 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.TankSubsystem;
 import frc.robot.subsystems.FuelSubsystem;
+import frc.robot.subsystems.Lights;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,12 +32,15 @@ public class RobotContainer {
   FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
   ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   TankSubsystem zoomZoom = new TankSubsystem();
+  Lights lights = new Lights();
+
    // Replace with CommandPS4Controller or CommandJoystick if needed
   CommandXboxController operatorController = new CommandXboxController(2);
   Joystick leftJoystick = new Joystick(0);
   Joystick righJoystick = new Joystick(1);
 
   SendableChooser<Command> autoChooser;
+  SendableChooser<Command> lightChooser;
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -45,6 +50,19 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Select Auto", autoChooser);
+
+    lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
+    lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
+    lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
+    lightChooser.addOption("rainbow", lights.rainbow());
+    SmartDashboard.putData("select lights", lightChooser);
+
+    lights.setDefaultCommand(lights.run(() -> {
+      CommandScheduler.getInstance().schedule(
+        lightChooser.getSelected()
+      );
+    } ));
+
   }
 
   /**
@@ -82,7 +100,7 @@ public class RobotContainer {
     operatorController.start().onTrue(
       climberSubsystem.extend()
     );
-    
+
 
     Supplier<Double> leftJoystickInputFilter = () -> MathUtil.applyDeadband(leftJoystick.getY(), .15);
     Supplier<Double> rightJoystickInputFilter = () -> MathUtil.applyDeadband(righJoystick.getY(), .15);
