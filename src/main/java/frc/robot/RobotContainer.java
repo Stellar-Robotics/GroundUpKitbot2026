@@ -30,7 +30,7 @@ import frc.robot.subsystems.Lights;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
-  ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+  //ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   TankSubsystem zoomZoom = new TankSubsystem();
   Lights lights = new Lights();
 
@@ -50,6 +50,8 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Select Auto", autoChooser);
+
+    lightChooser = new SendableChooser<>();
 
     lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
     lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
@@ -92,14 +94,14 @@ public class RobotContainer {
       ultimateDodgeBallMachine.dropStuff()
     );
     
-    operatorController.back().onTrue(
-      climberSubsystem.finalClimberingSequence()
-    );
+    // operatorController.back().onTrue(
+    //   climberSubsystem.finalClimberingSequence()
+    // );
     
 
-    operatorController.start().onTrue(
-      climberSubsystem.extend()
-    );
+    // operatorController.start().onTrue(
+    //   climberSubsystem.extend()
+    // );
 
 
     Supplier<Double> leftJoystickInputFilter = () -> MathUtil.applyDeadband(leftJoystick.getY(), .15);
