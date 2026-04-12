@@ -125,8 +125,17 @@ public class Lights extends SubsystemBase {
     return lights;
   }
 
-  
 
+  /*the next ones im not exactly sure what they will do but
+    im pretty sure they will include the 2 colors that are the primary and secondary*/
+  
+  public Command gradiant() {
+    return runOnce(() -> light.set(0.41));
+  }
+
+  public Command sparkle() {
+    return runOnce(() -> light.set(0.39));
+  }
 
 
 

@@ -52,10 +52,7 @@ public class RobotContainer {
 
     lightChooser = new SendableChooser<>();
 
-    lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
-    lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
-    lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
-    lightChooser.addOption("rainbow", lights.rainbow());
+    //solid colors
     lightChooser.addOption("red", lights.red());
     lightChooser.addOption("orange", lights.orange());
     lightChooser.addOption("yellow", lights.yellow());
@@ -64,8 +61,16 @@ public class RobotContainer {
     lightChooser.addOption("purple", lights.purple());
     lightChooser.addOption("white", lights.white());
     lightChooser.addOption("black", lights.black());
+
+    //designs
+    lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
+    lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
+    lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
+    lightChooser.addOption("rainbow", lights.rainbow());
     lightChooser.addOption("red white and blue", lights.USAAAAAA());
     lightChooser.addOption("monochromatic", lights.monochromatic());
+    lightChooser.addOption("gradiant", lights.gradiant());
+    lightChooser.addOption("sparkle", lights.sparkle());
 
     SmartDashboard.putData("select lights", lightChooser);
 
