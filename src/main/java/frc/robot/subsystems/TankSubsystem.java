@@ -92,6 +92,9 @@ public class TankSubsystem extends SubsystemBase {
     configurePathPlanner();
     gyro.reset();
     gyro.calibrate();
+
+    SmartDashboard.putBoolean("Safer Speed", true);
+
   }
 
   public void chassisDrive(ChassisSpeeds chassisSpeedSupplier) {
@@ -143,15 +146,23 @@ public class TankSubsystem extends SubsystemBase {
 
   public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed, boolean squareInputs, boolean slowerRobot) {
 
-    double speedMuliplier = slowerRobot ? 3 : 1;
-
     Command driveCommand = run(() -> {
+
+      double speedMultiplier = slowerRobot ? 0.3 : 1;
+
+      boolean dashSpeedOverride = SmartDashboard.getBoolean("Safer Speed",true);
+      if (dashSpeedOverride == true) {
+        speedMultiplier = 0.3;
+      } else{
+        speedMultiplier = 1;
+      }
+
       if (squareInputs) { // Optionally square inputs (finer control at lower speeds)
-        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2) / speedMuliplier);
-        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2) / speedMuliplier);
+        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2) * speedMultiplier);
+        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2) * speedMultiplier);
       } else {
-        tankFRMotor.set(rightSpeed.get() / speedMuliplier);
-        tankFLMotor.set(leftSpeed.get() / speedMuliplier);
+        tankFRMotor.set(rightSpeed.get() * speedMultiplier);
+        tankFLMotor.set(leftSpeed.get() * speedMultiplier);
       }
     });
 
