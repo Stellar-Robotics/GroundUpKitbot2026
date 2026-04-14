@@ -141,15 +141,17 @@ public class TankSubsystem extends SubsystemBase {
 
   }
 
-  public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed, boolean squareInputs) {
+  public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed, boolean squareInputs, boolean slowerRobot) {
+
+    double speedMuliplier = slowerRobot ? 3 : 1;
 
     Command driveCommand = run(() -> {
       if (squareInputs) { // Optionally square inputs (finer control at lower speeds)
-        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2));
-        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2));
+        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2) / speedMuliplier);
+        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2) / speedMuliplier);
       } else {
-        tankFRMotor.set(rightSpeed.get());
-        tankFLMotor.set(leftSpeed.get());
+        tankFRMotor.set(rightSpeed.get() / speedMuliplier);
+        tankFLMotor.set(leftSpeed.get() / speedMuliplier);
       }
     });
 

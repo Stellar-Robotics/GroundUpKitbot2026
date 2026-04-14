@@ -61,6 +61,7 @@ public class RobotContainer {
     lightChooser.addOption("purple", lights.purple());
     lightChooser.addOption("white", lights.white());
     lightChooser.addOption("black", lights.black());
+    lightChooser.addOption("none :c", lights.noLights());
 
     //designs
     lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
@@ -123,7 +124,7 @@ public class RobotContainer {
     Supplier<Double> rightJoystickInputFilter = () -> MathUtil.applyDeadband(righJoystick.getY(), .15);
 
     //this goes zoom zoom
-    zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter, true));
+    zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter, true, false));
 
 
   }

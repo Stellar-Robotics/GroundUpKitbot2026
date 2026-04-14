@@ -138,6 +138,11 @@ public class Lights extends SubsystemBase {
   }
 
 
+  public Command noLights() {
+    return runOnce(() -> light.set(0));
+  }
+
+
 
   @Override
   public void periodic() {
