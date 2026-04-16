@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.TankSubsystem;
@@ -39,7 +38,7 @@ public class RobotContainer {
   Joystick righJoystick = new Joystick(1);
 
   SendableChooser<Command> autoChooser;
-  SendableChooser<Command> lightChooser;
+
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -50,36 +49,32 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Select Auto", autoChooser);
 
-    lightChooser = new SendableChooser<>();
+    lights.lightsClass();
 
     //solid colors
-    lightChooser.addOption("red", lights.red());
-    lightChooser.addOption("orange", lights.orange());
-    lightChooser.addOption("yellow", lights.yellow());
-    lightChooser.addOption("green", lights.green());
-    lightChooser.addOption("blue", lights.blue());
-    lightChooser.addOption("purple", lights.purple());
-    lightChooser.addOption("white", lights.white());
-    lightChooser.addOption("black", lights.black());
-    lightChooser.addOption("none :c", lights.noLights());
+    lights.lightChooser.addOption("red", lights.red());
+    lights.lightChooser.addOption("orange", lights.orange());
+    lights.lightChooser.addOption("yellow", lights.yellow());
+    lights.lightChooser.addOption("green", lights.green());
+    lights.lightChooser.addOption("blue", lights.blue());
+    lights.lightChooser.addOption("purple", lights.purple());
+    lights.lightChooser.addOption("white", lights.white());
+    lights.lightChooser.addOption("black", lights.black());
+    lights.lightChooser.addOption("none :c", lights.noLights());
 
     //designs
-    lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
-    lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
-    lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
-    lightChooser.addOption("rainbow", lights.rainbow());
-    lightChooser.addOption("red white and blue", lights.USAAAAAA());
-    lightChooser.addOption("monochromatic", lights.monochromatic());
-    lightChooser.addOption("gradiant", lights.gradiant());
-    lightChooser.addOption("sparkle", lights.sparkle());
+    lights.lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
+    lights.lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
+    lights.lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
+    lights.lightChooser.addOption("rainbow", lights.rainbow());
+    lights.lightChooser.addOption("red white and blue", lights.USAAAAAA());
+    lights.lightChooser.addOption("monochromatic", lights.monochromatic());
+    lights.lightChooser.addOption("gradiant", lights.gradiant());
+    lights.lightChooser.addOption("sparkle", lights.sparkle());
 
-    SmartDashboard.putData("select lights", lightChooser);
+    SmartDashboard.putData("select lights", lights.lightChooser);
 
-    lights.setDefaultCommand(lights.run(() -> {
-      CommandScheduler.getInstance().schedule(
-        lightChooser.getSelected()
-      );
-    } ));
+    lights.setDefaultCommand(lights.run(() -> lights.lightCommand()));
 
   }
 
@@ -140,4 +135,5 @@ public class RobotContainer {
     // An example command will be run in autonomous
     return autoChooser.getSelected();
   }
+
 }

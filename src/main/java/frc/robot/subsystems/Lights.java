@@ -4,13 +4,21 @@
 
 package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class Lights extends SubsystemBase {
   /** Creates a new Lights. */
+
+  public SendableChooser<Command> lightChooser;
+
   Spark light = new Spark(0);
+
+  public void lightsClass() {
+    lightChooser = new SendableChooser<>();
+  }
 
   public void blinker(double color, double time) {
     light.set(0.85);
@@ -141,7 +149,14 @@ public class Lights extends SubsystemBase {
   public Command noLights() {
     return runOnce(() -> light.set(0));
   }
-
+  
+  public Command lightCommand() {
+    Command lightCommand = runOnce(()->{
+      lightChooser.getSelected();
+    }
+    );
+    return lightCommand;
+  }
 
 
   @Override
