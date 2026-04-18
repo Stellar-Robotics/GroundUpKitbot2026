@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import java.util.logging.Logger;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -19,6 +19,14 @@ public class Lights extends SubsystemBase {
 
   Spark light = new Spark(0);
 
+  public double lightColor() {
+    try {
+      return lightChooser.getSelected();
+    } catch (Exception e) {
+      return 0;
+    }
+  }
+  
   public Lights() {
     lightChooser = new SendableChooser<>();
 
@@ -34,17 +42,16 @@ public class Lights extends SubsystemBase {
     lightChooser.addOption("white", 0.93);
     lightChooser.addOption("black", 0.99);
 
-    // //designs
-    // lights.lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
-    // lights.lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
-    // lights.lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
-    // lights.lightChooser.addOption("rainbow", lights.rainbow());
-    // lights.lightChooser.addOption("red white and blue", lights.USAAAAAA());
-    // lights.lightChooser.addOption("monochromatic", lights.monochromatic());
-    // lights.lightChooser.addOption("gradiant", lights.gradiant());
-    // lights.lightChooser.addOption("sparkle", lights.sparkle());
-
     SmartDashboard.putData("select lights", lightChooser);
+  }
+
+  public Command lightCommand() {
+    Command lightCommand = runOnce(() -> {
+      Supplier<Double> lightColor = () -> lightColor();
+      light.set(lightColor.get());
+    }
+    );
+    return lightCommand;
   }
 
   public void blinker(double color, double time) {
@@ -192,6 +199,7 @@ public class Lights extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("light color", lightColor());
+  } 
   }
-}
+
