@@ -49,32 +49,7 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Select Auto", autoChooser);
 
-    lights.lightsClass();
-
-    //solid colors
-    lights.lightChooser.addOption("red", lights.red());
-    lights.lightChooser.addOption("orange", lights.orange());
-    lights.lightChooser.addOption("yellow", lights.yellow());
-    lights.lightChooser.addOption("green", lights.green());
-    lights.lightChooser.addOption("blue", lights.blue());
-    lights.lightChooser.addOption("purple", lights.purple());
-    lights.lightChooser.addOption("white", lights.white());
-    lights.lightChooser.addOption("black", lights.black());
-    lights.lightChooser.addOption("none :c", lights.noLights());
-
-    //designs
-    lights.lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
-    lights.lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
-    lights.lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
-    lights.lightChooser.addOption("rainbow", lights.rainbow());
-    lights.lightChooser.addOption("red white and blue", lights.USAAAAAA());
-    lights.lightChooser.addOption("monochromatic", lights.monochromatic());
-    lights.lightChooser.addOption("gradiant", lights.gradiant());
-    lights.lightChooser.addOption("sparkle", lights.sparkle());
-
-    SmartDashboard.putData("select lights", lights.lightChooser);
-
-    lights.setDefaultCommand(lights.run(() -> lights.lightCommand()));
+    // lights.setDefaultCommand(lights.lightCommand());
 
   }
 

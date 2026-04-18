@@ -3,8 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -12,12 +15,36 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class Lights extends SubsystemBase {
   /** Creates a new Lights. */
 
-  public SendableChooser<Command> lightChooser;
+  public SendableChooser<Double> lightChooser;
 
   Spark light = new Spark(0);
 
-  public void lightsClass() {
+  public Lights() {
     lightChooser = new SendableChooser<>();
+
+    //solid colors
+    lightChooser.addOption("red", 0.57);
+    lightChooser.addOption("orange", 0.63);
+    lightChooser.addOption("yellow", 0.69);
+    lightChooser.addOption("lime green", 0.73);
+    lightChooser.addOption("green", 0.77);
+    lightChooser.addOption("aqua", 0.81);
+    lightChooser.addOption("blue", 0.87);
+    lightChooser.addOption("purple", 0.91);
+    lightChooser.addOption("white", 0.93);
+    lightChooser.addOption("black", 0.99);
+
+    // //designs
+    // lights.lightChooser.addOption("blue and yellow blinking", lights.blueAndYellow());
+    // lights.lightChooser.addOption("faster blue and yellow blinking", lights.fasterBlueAndYellow());
+    // lights.lightChooser.addOption("mixed blue and yellow blinking", lights.mixedBlueAndYellow());
+    // lights.lightChooser.addOption("rainbow", lights.rainbow());
+    // lights.lightChooser.addOption("red white and blue", lights.USAAAAAA());
+    // lights.lightChooser.addOption("monochromatic", lights.monochromatic());
+    // lights.lightChooser.addOption("gradiant", lights.gradiant());
+    // lights.lightChooser.addOption("sparkle", lights.sparkle());
+
+    SmartDashboard.putData("select lights", lightChooser);
   }
 
   public void blinker(double color, double time) {
@@ -150,13 +177,17 @@ public class Lights extends SubsystemBase {
     return runOnce(() -> light.set(0));
   }
   
-  public Command lightCommand() {
-    Command lightCommand = runOnce(()->{
-      lightChooser.getSelected();
-    }
-    );
-    return lightCommand;
-  }
+  // public Command lightCommand() {
+  //   Command lightCommand;
+  //   try {
+  //     lightCommand = lightChooser.getSelected();
+  //     lightCommand.setName("LightSelect");
+  //   } catch (Exception e) {
+  //     lightCommand = new Command() {};
+  //     Logger.getGlobal().info("No Light Command!!");
+  //   }
+  //   return lightCommand;
+  // }
 
 
   @Override
