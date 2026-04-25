@@ -49,6 +49,7 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Select Auto", autoChooser);
 
+    lights.setDefaultCommand(lights.lightCommand());
 
   }
 

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -20,6 +21,7 @@ public class FuelSubsystem extends SubsystemBase {
 
   SparkMax dualFuelMotor = new SparkMax(12, MotorType.kBrushless);
   SparkMax kickerMotor = new SparkMax(13, MotorType.kBrushless);
+  //SparkFlex vortexMotor = new SparkFlex(0, MotorType.kBrushless);
 
   /** Creates a new FuelSubsystem. */
   public FuelSubsystem() {
@@ -67,24 +69,19 @@ public class FuelSubsystem extends SubsystemBase {
     public Command shootStuff() {
 
       Command SpinUpShooter = runOnce(() -> {
-        dualFuelMotor.setVoltage(8);
+        dualFuelMotor.setVoltage(8.5);
+        //vortexMotor.setVoltage(8.5);
       });
 
-      Command runWeeeMotor = run(() -> {
-        kickerMotor.setVoltage(-8);
-      });
+      Command runkickerMotor = run(() -> {kickerMotor.setVoltage(-8);});
 
-
-      Command rnWeeeMotor = runOnce(()->{
-        kickerMotor.setVoltage(8);
-      }
-      );
+      Command rnKickerMotor = runOnce(()->{kickerMotor.setVoltage(8);});
 
       Command commandSeq = new SequentialCommandGroup(
         SpinUpShooter,
-        rnWeeeMotor,
-        new WaitCommand(1),
-        runWeeeMotor
+        rnKickerMotor,
+        new WaitCommand(4),
+        runkickerMotor
       ).handleInterrupt(() -> {
         dualFuelMotor.setVoltage(0);
         kickerMotor.setVoltage(0);
