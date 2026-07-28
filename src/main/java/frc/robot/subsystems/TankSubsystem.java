@@ -80,7 +80,7 @@ public class TankSubsystem extends SubsystemBase {
       .follow(MotorConstants.fRCanID);
 
     tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
-    tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
+    tankFRMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
     tankFLMotorConfig.closedLoop.pid(0.01, 0, 0);
     tankFRMotorConfig.closedLoop.pid(0.01, 0, 0);
 
