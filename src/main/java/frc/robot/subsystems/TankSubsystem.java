@@ -30,6 +30,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,7 +46,7 @@ public class TankSubsystem extends SubsystemBase {
 
   Field2d field = new Field2d();
 
-  
+  public SendableChooser<Double> robotSpeed;
   
   ADIS16470_IMU gyro = new ADIS16470_IMU();
 
@@ -94,6 +95,14 @@ public class TankSubsystem extends SubsystemBase {
     gyro.calibrate();
 
     SmartDashboard.putBoolean("Safer Speed", true);
+
+    SmartDashboard.putData("robot speed", robotSpeed);
+
+    robotSpeed = new SendableChooser<>();
+
+    robotSpeed.addOption("normal speed", 1.0);
+    robotSpeed.addOption("safer speed", 0.3);
+    robotSpeed.addOption("super duper slow mode", 0.1);
 
   }
 
@@ -150,6 +159,8 @@ public class TankSubsystem extends SubsystemBase {
 
       double speedMultiplier = slowerRobot ? 0.3 : 1;
 
+      double speedMultipliers = robotSpeed.getSelected();
+
       boolean dashSpeedOverride = SmartDashboard.getBoolean("Safer Speed",true);
       if (dashSpeedOverride == true) {
         speedMultiplier = 0.3;
@@ -158,11 +169,11 @@ public class TankSubsystem extends SubsystemBase {
       }
 
       if (squareInputs) { // Optionally square inputs (finer control at lower speeds)
-        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2) * speedMultiplier);
-        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2) * speedMultiplier);
+        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2) * speedMultipliers);
+        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2) * speedMultipliers);
       } else {
-        tankFRMotor.set(rightSpeed.get() * speedMultiplier);
-        tankFLMotor.set(leftSpeed.get() * speedMultiplier);
+        tankFRMotor.set(rightSpeed.get() * speedMultipliers);
+        tankFLMotor.set(leftSpeed.get() * speedMultipliers);
       }
     });
 
