@@ -42,5 +42,8 @@ public final class Constants {
   public static class tankConstants {
     //public static final double RotationsInAMeter = 22.369415248865; // 10.71:1 ratio
     public static final double RotationsInAMeter = 17.669958263809; // 8.46:1 ratio
+
+    public static final double speedOfTurn = 2;  /*used for the boundires method to dictate
+                                                 how fast the robot will turn when it goes out of bounds*/
   }
 }

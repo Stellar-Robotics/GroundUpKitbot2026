@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.tankConstants;
 
@@ -183,6 +185,48 @@ public class TankSubsystem extends SubsystemBase {
   public Command getAutonmousCommand() {
     return new PathPlannerAuto("PUT AUTO NAME HERE");
   }
+
+
+
+  public BooleanSupplier outOfBounds(double xRestriction, double yRestriction) {
+
+    double[] robotPose = {poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY()};
+    
+    
+    BooleanSupplier outOfBounds = () -> {
+      if(robotPose[0] >= xRestriction 
+      || robotPose[1] >= yRestriction 
+      || robotPose[0] <= 0 
+      || robotPose[1] <= 0) {    //returns true if the robot leaves the boundries
+        return true;
+      }
+      else {
+        return false;
+      }
+    };
+    return outOfBounds;
+    }
+
+    public Command boundries(double xRestriction, double yRestriction) {
+
+      boolean outOfBounds = outOfBounds(xRestriction, yRestriction).getAsBoolean();
+      Pose2d centerPose2d = new Pose2d(xRestriction/2, yRestriction/2, Rotation2d.fromDegrees(0));
+      double[] center = {xRestriction/2, yRestriction/2};
+      double[] robotPose = {poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY()};
+
+      Command boundries = run(() ->{
+        if(outOfBounds) {
+          Supplier<Double> robotAngle = () -> poseEstimator.getEstimatedPosition().getRotation().getDegrees();
+          double targetAngle = 180-Math.atan(robotPose[0]-center[0]/robotPose[1]-center[1]);
+          while(robotAngle.get() != targetAngle +- (tankConstants.speedOfTurn * 5)); {
+            frontLeftCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speedOfTurn, ControlType.kPosition);  //tune this
+          }
+        }
+      }
+      );
+      return boundries;
+    }
+    
 
   @Override
   public void periodic() {

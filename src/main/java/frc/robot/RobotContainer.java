@@ -96,6 +96,12 @@ public class RobotContainer {
     //this goes zoom zoom
     zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter, true, false));
 
+    double xRestriction = SmartDashboard.getNumber("WidthRestrictionsInMeters", 2.7432);
+    double yRestriction = SmartDashboard.getNumber("lengthRestrictionsInMeters", 2.7432);
+      if(SmartDashboard.getBoolean("EnableBoundries", false)) {
+        zoomZoom.boundries(xRestriction, yRestriction);
+      }
+
 
   }
 
