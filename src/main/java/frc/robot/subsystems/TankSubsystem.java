@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -190,14 +192,14 @@ public class TankSubsystem extends SubsystemBase {
 
   public BooleanSupplier outOfBounds(double xRestriction, double yRestriction) {
 
-    double[] robotPose = {poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY()};
+    Supplier<List<Double>> robotPose = () -> Arrays.asList(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY());
     
     
     BooleanSupplier outOfBounds = () -> {
-      if(robotPose[0] >= xRestriction 
-      || robotPose[1] >= yRestriction 
-      || robotPose[0] <= 0 
-      || robotPose[1] <= 0) {    //returns true if the robot leaves the boundries
+      if(robotPose.get().get(0) >= xRestriction 
+      || robotPose.get().get(1) >= yRestriction 
+      || robotPose.get().get(0) <= 0 
+      || robotPose.get().get(1) <= 0) {    //returns true if the robot leaves the boundries
         return true;
       }
       else {
@@ -212,14 +214,21 @@ public class TankSubsystem extends SubsystemBase {
       boolean outOfBounds = outOfBounds(xRestriction, yRestriction).getAsBoolean();
       Pose2d centerPose2d = new Pose2d(xRestriction/2, yRestriction/2, Rotation2d.fromDegrees(0));
       double[] center = {xRestriction/2, yRestriction/2};
-      double[] robotPose = {poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY()};
+      Supplier<List<Double>> robotPose = () -> Arrays.asList(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY());
 
       Command boundries = run(() ->{
         if(outOfBounds) {
           Supplier<Double> robotAngle = () -> poseEstimator.getEstimatedPosition().getRotation().getDegrees();
-          double targetAngle = 180-Math.atan(robotPose[0]-center[0]/robotPose[1]-center[1]);
+          double targetAngle = 180-Math.atan(robotPose.get().get(0)-center[0]/robotPose.get().get(1)-center[1]);
           while(robotAngle.get() != targetAngle +- (tankConstants.speedOfTurn * 5)); {
             frontLeftCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speedOfTurn, ControlType.kPosition);  //tune this
+          }
+          while(robotPose.get().get(0) >= xRestriction-2 
+            || robotPose.get().get(1) >= yRestriction-2 
+            || robotPose.get().get(0) <= 2 
+            || robotPose.get().get(1) <= 2) {
+              frontLeftCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speed, ControlType.kPosition);
+              frontRightCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speed, ControlType.kPosition);
           }
         }
       }

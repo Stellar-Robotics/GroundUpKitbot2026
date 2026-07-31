@@ -45,5 +45,7 @@ public final class Constants {
 
     public static final double speedOfTurn = 2;  /*used for the boundires method to dictate
                                                  how fast the robot will turn when it goes out of bounds*/
+    public static final double speed = 2;    /*use for the boundries method to dictate how fast the robot
+                                               will move to get back into bounds*/
   }
 }
