@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -89,6 +90,9 @@ public class RobotContainer {
     //   climberSubsystem.extend()
     // );
 
+    new Trigger(() -> leftJoystick.getRawButtonPressed(9)).onTrue(zoomZoom.flipsDriveCommand());
+      
+    SmartDashboard.putBoolean("robot reversed", zoomZoom.isReversed);
 
     Supplier<Double> leftJoystickInputFilter = () -> MathUtil.applyDeadband(leftJoystick.getY(), .15);
     Supplier<Double> rightJoystickInputFilter = () -> MathUtil.applyDeadband(righJoystick.getY(), .15);

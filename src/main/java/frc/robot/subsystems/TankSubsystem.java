@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -37,7 +39,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.tankConstants;
 
@@ -58,7 +59,7 @@ public class TankSubsystem extends SubsystemBase {
 
   DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
     kinematics, 
-    Rotation2d.fromDegrees(gyro.getAngle()), 
+    Rotation2d.fromDegrees(Math.IEEEremainder(gyro.getAngle() + 90, 360)), 
     -tankFLMotor.getEncoder().getPosition(), 
     -tankFRMotor.getEncoder().getPosition(), 
     new Pose2d(0, 5, Rotation2d.fromDegrees(0))
@@ -124,6 +125,8 @@ public class TankSubsystem extends SubsystemBase {
     return chassisSpeeds;
   }
 
+
+
   public void configurePathPlanner() {
     
     RobotConfig config;
@@ -156,33 +159,41 @@ public class TankSubsystem extends SubsystemBase {
     }
 
   }
+    
+  public Boolean isReversed = false;
 
   public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed, boolean squareInputs, boolean slowerRobot) {
 
     Command driveCommand = run(() -> {
 
-      double speedMultiplier = slowerRobot ? 0.3 : 1;
+      //double speedMultiplier = slowerRobot ? 0.3 : 1;
 
       double speedMultipliers = robotSpeed.getSelected();
 
-      boolean dashSpeedOverride = SmartDashboard.getBoolean("Safer Speed",true);
-      if (dashSpeedOverride == true) {
-        speedMultiplier = 0.3;
-      } else{
-        speedMultiplier = 1;
-      }
+      // boolean dashSpeedOverride = SmartDashboard.getBoolean("Safer Speed",true);
+      // if (dashSpeedOverride == true) {
+      //   speedMultiplier = 0.3;
+      // } else{
+      //   speedMultiplier = 1;
+      // }
 
       if (squareInputs) { // Optionally square inputs (finer control at lower speeds)
-        tankFRMotor.set(MathUtil.copyDirectionPow(rightSpeed.get(), 2) * speedMultipliers);
-        tankFLMotor.set(MathUtil.copyDirectionPow(leftSpeed.get(), 2) * speedMultipliers);
+        tankFRMotor.set(isReversed ? 
+          MathUtil.copyDirectionPow(-rightSpeed.get(), 2) * speedMultipliers :
+          MathUtil.copyDirectionPow(rightSpeed.get(), 2) * speedMultipliers);
+        tankFLMotor.set(isReversed ? 
+          MathUtil.copyDirectionPow(-leftSpeed.get(), 2) * speedMultipliers :
+          MathUtil.copyDirectionPow(leftSpeed.get(), 2) * speedMultipliers);
       } else {
-        tankFRMotor.set(rightSpeed.get() * speedMultipliers);
-        tankFLMotor.set(leftSpeed.get() * speedMultipliers);
+        tankFRMotor.set(isReversed ? -rightSpeed.get() * speedMultipliers : rightSpeed.get() * speedMultipliers);
+        tankFLMotor.set(isReversed ? -leftSpeed.get() * speedMultipliers : leftSpeed.get() * speedMultipliers);
       }
     });
 
     return driveCommand;
   }
+
+  public Command flipsDriveCommand() {return run(() -> isReversed = !isReversed);}
 
   public Command getAutonmousCommand() {
     return new PathPlannerAuto("PUT AUTO NAME HERE");
