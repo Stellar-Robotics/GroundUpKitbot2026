@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -99,15 +96,16 @@ public class TankSubsystem extends SubsystemBase {
     gyro.reset();
     gyro.calibrate();
 
-    SmartDashboard.putBoolean("Safer Speed", true);
-
-    SmartDashboard.putData("robot speed", robotSpeed);
-
     robotSpeed = new SendableChooser<>();
 
     robotSpeed.addOption("normal speed", 1.0);
     robotSpeed.addOption("safer speed", 0.3);
     robotSpeed.addOption("super duper slow mode", 0.1);
+    robotSpeed.setDefaultOption("normal speed", 1.0);
+
+    SmartDashboard.putBoolean("Safer Speed", true);
+
+    SmartDashboard.putData("robot speed", robotSpeed);
 
   }
 
@@ -223,7 +221,7 @@ public class TankSubsystem extends SubsystemBase {
     public Command boundries(double xRestriction, double yRestriction) {
 
       boolean outOfBounds = outOfBounds(xRestriction, yRestriction).getAsBoolean();
-      Pose2d centerPose2d = new Pose2d(xRestriction/2, yRestriction/2, Rotation2d.fromDegrees(0));
+      //Pose2d centerPose2d = new Pose2d(xRestriction/2, yRestriction/2, Rotation2d.fromDegrees(0));
       double[] center = {xRestriction/2, yRestriction/2};
       Supplier<List<Double>> robotPose = () -> Arrays.asList(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY());
 

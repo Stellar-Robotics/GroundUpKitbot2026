@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -17,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.TankSubsystem;
-import frc.robot.subsystems.FuelSubsystem;
-import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.FuelSubsystemV2;
+//import frc.robot.subsystems.Lights;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,10 +27,11 @@ import frc.robot.subsystems.Lights;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
+  //FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
+  FuelSubsystemV2 fuelSubsystem = new FuelSubsystemV2();
   //ClimberSubsystem climberSubsystem = new ClimberSubsystem();
   TankSubsystem zoomZoom = new TankSubsystem();
-  Lights lights = new Lights();
+  //Lights lights = new Lights();
 
    // Replace with CommandPS4Controller or CommandJoystick if needed
   CommandXboxController operatorController = new CommandXboxController(2);
@@ -50,7 +50,7 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Select Auto", autoChooser);
 
-    lights.setDefaultCommand(lights.lightCommand());
+    //lights.setDefaultCommand(lights.lightCommand());
 
   }
 
@@ -64,31 +64,15 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true
 
-    //this shoots
-    operatorController.rightTrigger().whileTrue(
-      ultimateDodgeBallMachine.shootStuff()
-    );
+    // Spin up and launch
+    operatorController.rightTrigger().whileTrue(fuelSubsystem.spinUpAndLaunchCommand());
+    // Intake fuel
+    operatorController.pov(0).whileTrue(fuelSubsystem.intakeCommand());
+    // Expel fuel
+    operatorController.pov(180).whileTrue(fuelSubsystem.expelCommand());
 
-    //this intakes
-    operatorController.leftBumper().whileTrue(
-      ultimateDodgeBallMachine.intakeStuff()
-    );
 
-    //this drops
-    operatorController.rightBumper().whileTrue(
-      ultimateDodgeBallMachine.dropStuff()
-    );
-    
-    // operatorController.back().onTrue(
-    //   climberSubsystem.finalClimberingSequence()
-    // );
-    
-
-    // operatorController.start().onTrue(
-    //   climberSubsystem.extend()
-    // );
 
     new Trigger(() -> leftJoystick.getRawButtonPressed(9)).onTrue(zoomZoom.flipsDriveCommand());
       
@@ -100,11 +84,11 @@ public class RobotContainer {
     //this goes zoom zoom
     zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter, true, false));
 
-    double xRestriction = SmartDashboard.getNumber("WidthRestrictionsInMeters", 2.7432);
-    double yRestriction = SmartDashboard.getNumber("lengthRestrictionsInMeters", 2.7432);
-      if(SmartDashboard.getBoolean("EnableBoundries", false)) {
-        zoomZoom.boundries(xRestriction, yRestriction);
-      }
+    // double xRestriction = SmartDashboard.getNumber("WidthRestrictionsInMeters", 2.7432);
+    // double yRestriction = SmartDashboard.getNumber("lengthRestrictionsInMeters", 2.7432);
+    //   if(SmartDashboard.getBoolean("EnableBoundries", false)) {
+    //     //zoomZoom.boundries(xRestriction, yRestriction);
+    //   }
 
 
   }
