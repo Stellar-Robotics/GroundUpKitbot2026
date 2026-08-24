@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -13,10 +14,11 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-    
   }
+
 
   public static class MotorConstants {
     public static final int currentLimit = 60;
@@ -25,8 +27,8 @@ public final class Constants {
     public static final int fLCanID = 32;
     public static final int bRCanID = 30;
     public static final int climberCanID = 0;                        //change this
-
   }
+
 
   public static class ClimberConstants {
     public static final int firstClimb = 0;                          //change this
@@ -35,10 +37,17 @@ public final class Constants {
     public static final double autoClimb = 0;                        //change this
     public static final boolean unlocked = true;
     public static final boolean locked = false;
-
-
   }
 
+
+  public static class MechanismConstants {
+    public static final double intakeSpeedPercentage = 0.5;
+    public static final double feedSpeedPercentage = 0.5;
+    public static final int shootSpeedRPM = 2700;
+    public static final double spinUpTimeSeconds = 1.5;
+  }
+
+  
   public static class tankConstants {
     //public static final double RotationsInAMeter = 22.369415248865; // 10.71:1 ratio
     public static final double RotationsInAMeter = 17.669958263809; // 8.46:1 ratio

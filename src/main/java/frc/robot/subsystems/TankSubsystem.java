@@ -10,7 +10,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPLTVController;
 import com.revrobotics.PersistMode;
@@ -41,19 +40,19 @@ import frc.robot.Constants.tankConstants;
 
 public class TankSubsystem extends SubsystemBase {
 
+  // Motor definition
   SparkMax tankFLMotor = new SparkMax(MotorConstants.fLCanID, MotorType.kBrushless);
   SparkMax tankFRMotor = new SparkMax(MotorConstants.fRCanID, MotorType.kBrushless);
   SparkMax tankBLMotor = new SparkMax(MotorConstants.bLCanID, MotorType.kBrushless);
   SparkMax tankBRMotor = new SparkMax(MotorConstants.bRCanID, MotorType.kBrushless);
 
-  Field2d field = new Field2d();
+  // Create closed loop controller refrences
+  SparkClosedLoopController frontLeftCLC = tankFLMotor.getClosedLoopController();
+  SparkClosedLoopController frontRightCLC = tankFRMotor.getClosedLoopController();
 
-  public SendableChooser<Double> robotSpeed;
-  
+  // Robot sensing object definition
   ADIS16470_IMU gyro = new ADIS16470_IMU();
-
   DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(25));
-
   DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
     kinematics, 
     Rotation2d.fromDegrees(Math.IEEEremainder(gyro.getAngle() + 90, 360)), 
@@ -62,10 +61,17 @@ public class TankSubsystem extends SubsystemBase {
     new Pose2d(0, 5, Rotation2d.fromDegrees(0))
   );
 
-  SparkClosedLoopController frontLeftCLC = tankFLMotor.getClosedLoopController();
-  SparkClosedLoopController frontRightCLC = tankFRMotor.getClosedLoopController();
+  // Dashboard and visual feedback object definition
+  Field2d field = new Field2d();
+  public SendableChooser<Double> robotSpeed;
+
+  // Drivetrain reversed
+  public Boolean isReversed = false;
+
 
   public TankSubsystem() {
+
+    // Setup and configure motors
     SparkMaxConfig tankFLMotorConfig = new SparkMaxConfig();
     SparkMaxConfig tankFRMotorConfig = new SparkMaxConfig();
     SparkMaxConfig tankBLMotorConfig = new SparkMaxConfig();
@@ -92,23 +98,25 @@ public class TankSubsystem extends SubsystemBase {
     tankFLMotor.configure(tankFLMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     tankFRMotor.configure(tankFRMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    // Setup pathplanner and reset the gyro
     configurePathPlanner();
     gyro.reset();
     gyro.calibrate();
 
+    // Setup and publish speeds presets to the dashboard
     robotSpeed = new SendableChooser<>();
-
     robotSpeed.addOption("normal speed", 1.0);
     robotSpeed.addOption("safer speed", 0.3);
     robotSpeed.addOption("super duper slow mode", 0.1);
+
     robotSpeed.setDefaultOption("normal speed", 1.0);
 
     SmartDashboard.putBoolean("Safer Speed", true);
-
     SmartDashboard.putData("robot speed", robotSpeed);
-
   }
 
+
+  // Drive the robot using a chassisspeeds object (x and rot value)
   public void chassisDrive(ChassisSpeeds chassisSpeedSupplier) {
 
     DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeedSupplier);
@@ -117,6 +125,8 @@ public class TankSubsystem extends SubsystemBase {
     frontRightCLC.setSetpoint(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
   }
 
+
+  // Utility to convert direct wheel speeds to a chassis speeds object
   public ChassisSpeeds convertToChassisSpeeds(double leftSpeed, double rightSpeed) {
     DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(leftSpeed, rightSpeed);
     ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(wheelSpeeds);
@@ -124,7 +134,7 @@ public class TankSubsystem extends SubsystemBase {
   }
 
 
-
+  // Configure PathPlanner for auto configuration
   public void configurePathPlanner() {
     
     RobotConfig config;
@@ -157,9 +167,9 @@ public class TankSubsystem extends SubsystemBase {
     }
 
   }
-    
-  public Boolean isReversed = false;
 
+
+  // Traditional tank drive method
   public Command driveTank(Supplier<Double> leftSpeed, Supplier<Double> rightSpeed, boolean squareInputs, boolean slowerRobot) {
 
     Command driveCommand = run(() -> {
@@ -191,14 +201,11 @@ public class TankSubsystem extends SubsystemBase {
     return driveCommand;
   }
 
+
   public Command flipsDriveCommand() {return run(() -> isReversed = !isReversed);}
 
-  public Command getAutonmousCommand() {
-    return new PathPlannerAuto("PUT AUTO NAME HERE");
-  }
 
-
-
+  // Constructs supplier condition to tell if robot is outside of restricted area
   public BooleanSupplier outOfBounds(double xRestriction, double yRestriction) {
 
     Supplier<List<Double>> robotPose = () -> Arrays.asList(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY());
@@ -216,35 +223,38 @@ public class TankSubsystem extends SubsystemBase {
       }
     };
     return outOfBounds;
-    }
+  }
 
-    public Command boundries(double xRestriction, double yRestriction) {
 
-      boolean outOfBounds = outOfBounds(xRestriction, yRestriction).getAsBoolean();
-      //Pose2d centerPose2d = new Pose2d(xRestriction/2, yRestriction/2, Rotation2d.fromDegrees(0));
-      double[] center = {xRestriction/2, yRestriction/2};
-      Supplier<List<Double>> robotPose = () -> Arrays.asList(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY());
+  // Reposition the rovot automatically when robot goes
+  // outside of defined area.
+  public Command boundries(double xRestriction, double yRestriction) {
 
-      Command boundries = run(() ->{
-        if(outOfBounds) {
-          Supplier<Double> robotAngle = () -> poseEstimator.getEstimatedPosition().getRotation().getDegrees();
-          double targetAngle = 180-Math.atan(robotPose.get().get(0)-center[0]/robotPose.get().get(1)-center[1]);
-          while(robotAngle.get() != targetAngle +- (tankConstants.speedOfTurn * 5)); {
-            frontLeftCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speedOfTurn, ControlType.kPosition);  //tune this
-          }
-          while(robotPose.get().get(0) >= xRestriction-2 
-            || robotPose.get().get(1) >= yRestriction-2 
-            || robotPose.get().get(0) <= 2 
-            || robotPose.get().get(1) <= 2) {
-              frontLeftCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speed, ControlType.kPosition);
-              frontRightCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speed, ControlType.kPosition);
-          }
+    boolean outOfBounds = outOfBounds(xRestriction, yRestriction).getAsBoolean();
+    //Pose2d centerPose2d = new Pose2d(xRestriction/2, yRestriction/2, Rotation2d.fromDegrees(0));
+    double[] center = {xRestriction/2, yRestriction/2};
+    Supplier<List<Double>> robotPose = () -> Arrays.asList(poseEstimator.getEstimatedPosition().getX(), poseEstimator.getEstimatedPosition().getY());
+
+    Command boundries = run(() ->{
+      if(outOfBounds) {
+        Supplier<Double> robotAngle = () -> poseEstimator.getEstimatedPosition().getRotation().getDegrees();
+        double targetAngle = 180-Math.atan(robotPose.get().get(0)-center[0]/robotPose.get().get(1)-center[1]);
+        while(robotAngle.get() != targetAngle +- (tankConstants.speedOfTurn * 5)); {
+          frontLeftCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speedOfTurn, ControlType.kPosition);  //tune this
+        }
+        while(robotPose.get().get(0) >= xRestriction-2 
+          || robotPose.get().get(1) >= yRestriction-2 
+          || robotPose.get().get(0) <= 2 
+          || robotPose.get().get(1) <= 2) {
+            frontLeftCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speed, ControlType.kPosition);
+            frontRightCLC.setSetpoint(tankFLMotor.getEncoder().getPosition()+tankConstants.speed, ControlType.kPosition);
         }
       }
-      );
-      return boundries;
     }
-    
+    );
+    return boundries;
+  }
+
 
   @Override
   public void periodic() {
@@ -254,6 +264,8 @@ public class TankSubsystem extends SubsystemBase {
       -tankFRMotor.getEncoder().getPosition()
     );
 
+    // Update pose estimation each loop and
+    // ensure periodic feedback is updated.
     field.setRobotPose(poseEstimator.getEstimatedPosition());
     SmartDashboard.putData("Field", field);
     SmartDashboard.putNumber("GyroAngle", gyro.getAngle());

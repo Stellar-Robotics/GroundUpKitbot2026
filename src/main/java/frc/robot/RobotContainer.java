@@ -4,20 +4,19 @@
 
 package frc.robot;
 
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.TankSubsystem;
 import frc.robot.subsystems.FuelSubsystemV2;
-//import frc.robot.subsystems.Lights;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,33 +25,32 @@ import frc.robot.subsystems.FuelSubsystemV2;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  //FuelSubsystem ultimateDodgeBallMachine = new FuelSubsystem();
+
+  // The robot's subsystems are defined here...
   FuelSubsystemV2 fuelSubsystem = new FuelSubsystemV2();
-  //ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-  TankSubsystem zoomZoom = new TankSubsystem();
-  //Lights lights = new Lights();
+  TankSubsystem driveSubsystem = new TankSubsystem();
 
-   // Replace with CommandPS4Controller or CommandJoystick if needed
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  CommandJoystick leftJoystick = new CommandJoystick(0);
+  CommandJoystick righJoystick = new CommandJoystick(1);
   CommandXboxController operatorController = new CommandXboxController(2);
-  Joystick leftJoystick = new Joystick(0);
-  Joystick righJoystick = new Joystick(1);
 
-  SendableChooser<Command> autoChooser;
+  // Selector for autonomous
+  SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
+    // and subsystem command defaults
     configureBindings();
 
+    // Configure auto chooser (Add pathplanner autos as options here)
+    autoChooser.setDefaultOption("Sitting Duck", Commands.runOnce(() -> {}));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Select Auto", autoChooser);
-
-    //lights.setDefaultCommand(lights.lightCommand());
-
   }
+
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -72,27 +70,29 @@ public class RobotContainer {
     // Expel fuel
     operatorController.pov(180).whileTrue(fuelSubsystem.expelCommand());
 
-
-
-    new Trigger(() -> leftJoystick.getRawButtonPressed(9)).onTrue(zoomZoom.flipsDriveCommand());
+    // Invert drivetrain
+    leftJoystick.button(9).onTrue(driveSubsystem.flipsDriveCommand());
       
-    SmartDashboard.putBoolean("robot reversed", zoomZoom.isReversed);
+    SmartDashboard.putBoolean("robot reversed", driveSubsystem.isReversed);
 
-    Supplier<Double> leftJoystickInputFilter = () -> MathUtil.applyDeadband(leftJoystick.getY(), .15);
-    Supplier<Double> rightJoystickInputFilter = () -> MathUtil.applyDeadband(righJoystick.getY(), .15);
+    // this goes zoom zoom
+    driveSubsystem.setDefaultCommand(
+      driveSubsystem.driveTank(
+        () -> MathUtil.applyDeadband(leftJoystick.getY(), .15), 
+        () -> MathUtil.applyDeadband(righJoystick.getY(), .15), 
+        true, 
+        false
+      )
+    );
 
-    //this goes zoom zoom
-    zoomZoom.setDefaultCommand(zoomZoom.driveTank(leftJoystickInputFilter, rightJoystickInputFilter, true, false));
 
+    // Robot barrier restriction (NULL POINTER CRASH 8/24/26)
     // double xRestriction = SmartDashboard.getNumber("WidthRestrictionsInMeters", 2.7432);
     // double yRestriction = SmartDashboard.getNumber("lengthRestrictionsInMeters", 2.7432);
     //   if(SmartDashboard.getBoolean("EnableBoundries", false)) {
     //     //zoomZoom.boundries(xRestriction, yRestriction);
     //   }
-
-
   }
-
 
 
   /**
@@ -101,8 +101,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
     return autoChooser.getSelected();
   }
-
 }

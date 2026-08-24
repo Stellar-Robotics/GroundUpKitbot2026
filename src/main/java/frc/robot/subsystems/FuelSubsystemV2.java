@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.MechanismConstants;
 
 public class FuelSubsystemV2 extends SubsystemBase {
 
@@ -36,10 +37,10 @@ public class FuelSubsystemV2 extends SubsystemBase {
   private SparkClosedLoopController launcherCLC = launcherFlex.getClosedLoopController();
 
   // Set intake speed
-  private double intakeSpeedPercentage = 0.5;
-  private double feederSpeedPercentage = 0.5;
-  private int shooterSpeedRPM = 2700;
-  private double spinUpTimeSeconds = 1.5;
+  // private double intakeSpeedPercentage = 0.5;
+  // private double feederSpeedPercentage = 0.5;
+  // private int shooterSpeedRPM = 2700;
+  // private double spinUpTimeSeconds = 1.5;
 
 
   public FuelSubsystemV2() {
@@ -113,10 +114,17 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
   // Intake and expel commands at preset speed
   public Command intakeCommand() {
-    return runEnd(() -> setIntake(intakeSpeedPercentage), () -> setIntake(0)).withName("IntakeFuel");
+    return runEnd(
+      () -> setIntake(MechanismConstants.intakeSpeedPercentage), 
+      () -> setIntake(0)
+    ).withName("IntakeFuel");
   }
+
   public Command expelCommand() {
-    return runEnd(() -> setIntake(-intakeSpeedPercentage), () -> setIntake(0)).withName("ExpelFuel");
+    return runEnd(
+      () -> setIntake(-MechanismConstants.intakeSpeedPercentage),
+      () -> setIntake(0)
+    ).withName("ExpelFuel");
   }
 
 
@@ -124,11 +132,11 @@ public class FuelSubsystemV2 extends SubsystemBase {
   public Command spinUpAndLaunchCommand() {
     // Build a command composition
     Command com = new SequentialCommandGroup(
-      runOnce(() -> setShooterRPM(shooterSpeedRPM)), // Spin up
-      runOnce(() -> setFeeder(-feederSpeedPercentage)), // Run feeder backwards initally
-      runOnce(() -> setIntake(feederSpeedPercentage)), // Run intake to prevent fuel from leaving
-      new WaitCommand(spinUpTimeSeconds), // Wait for certin time
-      runOnce(() -> setFeeder(feederSpeedPercentage)), // Run feeder forwards
+      runOnce(() -> setShooterRPM(MechanismConstants.shootSpeedRPM)), // Spin up
+      runOnce(() -> setFeeder(-MechanismConstants.feedSpeedPercentage)), // Run feeder backwards initally
+      runOnce(() -> setIntake(MechanismConstants.feedSpeedPercentage)), // Run intake to prevent fuel from leaving
+      new WaitCommand(MechanismConstants.spinUpTimeSeconds), // Wait for certin time
+      runOnce(() -> setFeeder(MechanismConstants.feedSpeedPercentage)), // Run feeder forwards
       new WaitUntilCommand(() -> false)
     )
     .handleInterrupt(() -> {
@@ -141,5 +149,4 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
     return com;
   }
-
 }
