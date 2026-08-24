@@ -60,7 +60,7 @@ public class FuelSubsystemV2 extends SubsystemBase {
     launcherFlexConf
       .smartCurrentLimit(MotorConstants.currentLimit)
       .inverted(true)
-      .closedLoop.pid(0.002, 0, 0.002);
+      .closedLoop.pid(0.0025, 0, 0.0025);
 
     // Apply motor configs to motors
     intakeSpark.configure(

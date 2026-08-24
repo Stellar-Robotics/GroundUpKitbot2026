@@ -41,10 +41,10 @@ public final class Constants {
 
 
   public static class MechanismConstants {
-    public static final double intakeSpeedPercentage = 0.5;
-    public static final double feedSpeedPercentage = 0.5;
+    public static final double intakeSpeedPercentage = 0.75;
+    public static final double feedSpeedPercentage = 0.75;
     public static final int shootSpeedRPM = 2700;
-    public static final double spinUpTimeSeconds = 1.5;
+    public static final double spinUpTimeSeconds = 2;
   }
 
   
