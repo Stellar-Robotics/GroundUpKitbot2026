@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5862054208273886,
-        "y": 1.7642653352353794
+        "x": 3.5991440798858774,
+        "y": 1.7901426533523535
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.512539229671896,
-        "y": 1.652239657631955
+        "x": 2.4864194008559197,
+        "y": 1.7383880171184036
       },
       "isLocked": false,
-      "linkedName": "RightShootingPoint"
+      "linkedName": "rightStartingPoint"
     },
     {
       "anchor": {
-        "x": 2.4087874465049923,
-        "y": 4.067346647646221
+        "x": 2.2794008559201138,
+        "y": 3.0581312410841655
       },
       "prevControl": {
-        "x": 2.848701854493581,
-        "y": 4.429629101283882
-      },
-      "nextControl": {
-        "x": 1.9283365606429719,
-        "y": 3.671681212230439
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.719315263908701,
-        "y": 2.074793152639087
-      },
-      "prevControl": {
-        "x": 1.6971611982881591,
-        "y": 2.462952924393722
+        "x": 3.029843081312411,
+        "y": 3.3945363766048495
       },
       "nextControl": null,
       "isLocked": false,
@@ -61,10 +45,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "startToShootPaths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 39.463200842711224
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

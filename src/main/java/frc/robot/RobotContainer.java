@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -44,6 +48,7 @@ public class RobotContainer {
     // Configure the trigger bindings
     // and subsystem command defaults
     configureBindings();
+    initPathplanner();
 
     // Configure auto chooser (Add pathplanner autos as options here)
     autoChooser.setDefaultOption("Sitting Duck", Commands.runOnce(() -> {}));
@@ -82,8 +87,13 @@ public class RobotContainer {
         () -> MathUtil.applyDeadband(righJoystick.getY(), .15), 
         true, 
         false
+
+
       )
     );
+
+    
+
 
 
     // Robot barrier restriction (NULL POINTER CRASH 8/24/26)
@@ -92,6 +102,15 @@ public class RobotContainer {
     //   if(SmartDashboard.getBoolean("EnableBoundries", false)) {
     //     //zoomZoom.boundries(xRestriction, yRestriction);
     //   }
+  }
+
+  public void initPathplanner() {
+    Map<String, Command> autoCommands = new HashMap<>();
+
+      autoCommands.put("shootingCommand", fuelSubsystem.spinUpAndLaunchCommand());
+      autoCommands.put("intakeCommand", fuelSubsystem.intakeCommand());
+      
+      NamedCommands.registerCommands(autoCommands);
   }
 
 
