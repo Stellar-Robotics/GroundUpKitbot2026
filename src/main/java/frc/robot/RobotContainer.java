@@ -77,6 +77,8 @@ public class RobotContainer {
 
     // Invert drivetrain
     leftJoystick.button(9).onTrue(driveSubsystem.flipsDriveCommand());
+
+    leftJoystick.button(7).onTrue(driveSubsystem.testOdometry());
       
     SmartDashboard.putBoolean("robot reversed", driveSubsystem.isReversed);
 
@@ -120,6 +122,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return driveSubsystem.testOdometry();
+    //return autoChooser.getSelected();
   }
 }

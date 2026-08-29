@@ -22,6 +22,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -35,6 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.tankConstants;
 
@@ -90,8 +92,10 @@ public class TankSubsystem extends SubsystemBase {
 
     tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
     tankFRMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
-    tankFLMotorConfig.closedLoop.pid(0.01, 0, 0);
-    tankFRMotorConfig.closedLoop.pid(0.01, 0, 0);
+    tankFLMotorConfig.closedLoop.pid(0.0002, 0.000001, 0.015);
+    tankFRMotorConfig.closedLoop.pid(0.0002, 0.000001, 0.015);
+    tankFRMotorConfig.closedLoop.feedForward.kV(0.002);
+    tankFLMotorConfig.closedLoop.feedForward.kV(0.002);
 
     tankBLMotor.configure(tankBLMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     tankBRMotor.configure(tankBRMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -113,6 +117,7 @@ public class TankSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Safer Speed", true);
     SmartDashboard.putData("robot speed", robotSpeed);
+    SmartDashboard.putNumber("setPoint", 20);
   }
 
 
@@ -205,6 +210,23 @@ public class TankSubsystem extends SubsystemBase {
   public Command flipsDriveCommand() {return run(() -> isReversed = !isReversed);}
 
 
+  
+  public Command testOdometry() {
+    Command test = runEnd(() -> {
+      double setPoint = SmartDashboard.getNumber("setPoint", 20);
+      poseEstimator.resetPose(new Pose2d(3.664, 4.067, Rotation2d.fromDegrees(180)));
+      if(poseEstimator.getEstimatedPosition().getX() <= 7.0168) {
+        chassisDrive(new ChassisSpeeds(setPoint, 0, 0));
+      }
+    }, () -> {
+      chassisDrive(new ChassisSpeeds(0, 0, 0));
+    }
+    );
+    return test;
+  }
+
+
+
   // Constructs supplier condition to tell if robot is outside of restricted area
   public BooleanSupplier outOfBounds(double xRestriction, double yRestriction) {
 
@@ -228,6 +250,7 @@ public class TankSubsystem extends SubsystemBase {
 
   // Reposition the rovot automatically when robot goes
   // outside of defined area.
+
   public Command boundries(double xRestriction, double yRestriction) {
 
     boolean outOfBounds = outOfBounds(xRestriction, yRestriction).getAsBoolean();
@@ -263,6 +286,7 @@ public class TankSubsystem extends SubsystemBase {
       -tankFLMotor.getEncoder().getPosition(), 
       -tankFRMotor.getEncoder().getPosition()
     );
+
 
     // Update pose estimation each loop and
     // ensure periodic feedback is updated.
