@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPLTVController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -22,7 +23,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.MotorConstants;
 import frc.robot.Constants.tankConstants;
 
@@ -90,8 +89,10 @@ public class TankSubsystem extends SubsystemBase {
       .inverted(false)
       .follow(MotorConstants.fRCanID);
 
-    tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
-    tankFRMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter);
+    tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter)
+      .velocityConversionFactor(1 / 8.46);
+    tankFRMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter)
+      .velocityConversionFactor(1 / 8.46);
     tankFLMotorConfig.closedLoop.pid(0.0002, 0.000001, 0.015);
     tankFRMotorConfig.closedLoop.pid(0.0002, 0.000001, 0.015);
     tankFRMotorConfig.closedLoop.feedForward.kV(0.002);
@@ -152,7 +153,7 @@ public class TankSubsystem extends SubsystemBase {
         (poseReset) -> poseEstimator.resetPose(poseReset), 
         () -> convertToChassisSpeeds(tankFLMotor.getEncoder().getVelocity(), tankFRMotor.getEncoder().getVelocity()), 
         (chassisSpeeds, feedForwards) -> chassisDrive(chassisSpeeds),
-        new PPLTVController(0), 
+        new PPLTVController(0.02), 
         config, 
         () -> {
           //checks to see if we are on the red alliance, if so the path will be flipped
@@ -166,6 +167,13 @@ public class TankSubsystem extends SubsystemBase {
         }, 
           this
       );
+
+      PathPlannerLogging.setLogActivePathCallback(poses -> {
+        field.getObject("PPPaths").setPoses(poses);
+      });
+      PathPlannerLogging.setLogTargetPoseCallback(pose -> {
+        field.getObject("PPTgt").setPose(pose);
+      });
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
@@ -212,17 +220,30 @@ public class TankSubsystem extends SubsystemBase {
 
   
   public Command testOdometry() {
+
+    double xSetPoint = 0;
+
     Command test = runEnd(() -> {
       double setPoint = SmartDashboard.getNumber("setPoint", 20);
-      poseEstimator.resetPose(new Pose2d(3.664, 4.067, Rotation2d.fromDegrees(180)));
-      if(poseEstimator.getEstimatedPosition().getX() <= 7.0168) {
+      //if(poseEstimator.getEstimatedPosition().getX() >  1.0) {
         chassisDrive(new ChassisSpeeds(setPoint, 0, 0));
-      }
+      //}
     }, () -> {
       chassisDrive(new ChassisSpeeds(0, 0, 0));
     }
     );
-    return test;
+    return this.runOnce(() -> poseEstimator.resetPose(new Pose2d(xSetPoint, 4.067, Rotation2d.fromDegrees(180))))
+      .andThen(test).until(() -> poseEstimator.getEstimatedPosition().getX() >  1.0);
+  }
+
+
+  public Command odomCommand() {
+
+
+
+    return new Command() {
+      
+    };
   }
 
 
@@ -293,5 +314,6 @@ public class TankSubsystem extends SubsystemBase {
     field.setRobotPose(poseEstimator.getEstimatedPosition());
     SmartDashboard.putData("Field", field);
     SmartDashboard.putNumber("GyroAngle", gyro.getAngle());
+    SmartDashboard.putNumber("OdomX", poseEstimator.getEstimatedPosition().getX());
   }
 }
