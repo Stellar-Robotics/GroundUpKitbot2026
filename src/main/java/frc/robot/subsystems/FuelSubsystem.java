@@ -27,8 +27,8 @@ public class FuelSubsystem extends SubsystemBase {
     SparkMaxConfig dualFuelMotorConfig = new SparkMaxConfig();
     SparkMaxConfig kickerMotorConfig = new SparkMaxConfig();
 
-    dualFuelMotorConfig.smartCurrentLimit(MotorConstants.currentLimit).inverted(false);
-    kickerMotorConfig.smartCurrentLimit(MotorConstants.currentLimit).inverted(false);
+    dualFuelMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit).inverted(false);
+    kickerMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit).inverted(false);
 
 
     kickerMotor.configure(kickerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

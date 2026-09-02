@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.TankSubsystem;
@@ -38,6 +39,7 @@ public class RobotContainer {
   CommandJoystick leftJoystick = new CommandJoystick(0);
   CommandJoystick righJoystick = new CommandJoystick(1);
   CommandXboxController operatorController = new CommandXboxController(2);
+  CommandPS4Controller drivingController = new CommandPS4Controller(3);
 
   // Selector for autonomous
   SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -79,22 +81,22 @@ public class RobotContainer {
     leftJoystick.button(9).onTrue(driveSubsystem.flipsDriveCommand());
 
     leftJoystick.button(7).onTrue(driveSubsystem.testOdometry());
+
+    drivingController.cross().onTrue(driveSubsystem.flipsDriveCommand());
       
     SmartDashboard.putBoolean("robot reversed", driveSubsystem.isReversed);
 
     // this goes zoom zoom
     driveSubsystem.setDefaultCommand(
       driveSubsystem.driveTank(
-        () -> MathUtil.applyDeadband(leftJoystick.getY(), .15), 
-        () -> MathUtil.applyDeadband(righJoystick.getY(), .15), 
+        () -> MathUtil.applyDeadband(drivingController.getLeftY(), .05), 
+        () -> MathUtil.applyDeadband(drivingController.getRightY(), .05), 
         true, 
         false
-
-
       )
     );
 
-    
+      
 
 
 
@@ -122,7 +124,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //return driveSubsystem.testOdometry();
-    return autoChooser.getSelected();
+    return driveSubsystem.testOdometry();
+    //return autoChooser.getSelected();
   }
 }

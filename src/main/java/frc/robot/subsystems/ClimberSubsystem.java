@@ -55,7 +55,7 @@ public class ClimberSubsystem extends SubsystemBase {
   public ClimberSubsystem() {
     SparkMaxConfig climberMotorConfig = new SparkMaxConfig();
     
-    climberMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
+    climberMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
     .inverted(false)
     .closedLoop.pid(0, 0, 0);                                        //change these
 

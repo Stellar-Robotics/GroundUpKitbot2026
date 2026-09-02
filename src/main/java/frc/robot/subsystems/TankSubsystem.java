@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
@@ -78,16 +79,20 @@ public class TankSubsystem extends SubsystemBase {
     SparkMaxConfig tankBLMotorConfig = new SparkMaxConfig();
     SparkMaxConfig tankBRMotorConfig = new SparkMaxConfig();
 
-    tankFLMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
-      .inverted(true);
-    tankFRMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
-      .inverted(false);
-    tankBLMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
+    tankFLMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
       .inverted(true)
-      .follow(MotorConstants.fLCanID);
-    tankBRMotorConfig.smartCurrentLimit(MotorConstants.currentLimit)
+      .idleMode(IdleMode.kBrake);
+    tankFRMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
       .inverted(false)
-      .follow(MotorConstants.fRCanID);
+      .idleMode(IdleMode.kBrake);
+    tankBLMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
+      .inverted(true)
+      .follow(MotorConstants.fLCanID)
+      .idleMode(IdleMode.kBrake);
+    tankBRMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
+      .inverted(false)
+      .follow(MotorConstants.fRCanID)
+      .idleMode(IdleMode.kBrake);
 
     tankFLMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter)
       .velocityConversionFactor(1 / 8.46);
@@ -200,22 +205,24 @@ public class TankSubsystem extends SubsystemBase {
 
       if (squareInputs) { // Optionally square inputs (finer control at lower speeds)
         tankFRMotor.set(isReversed ? 
-          MathUtil.copyDirectionPow(-rightSpeed.get(), 2) * speedMultipliers :
+          MathUtil.copyDirectionPow(-leftSpeed.get(), 2) * speedMultipliers :
           MathUtil.copyDirectionPow(rightSpeed.get(), 2) * speedMultipliers);
         tankFLMotor.set(isReversed ? 
-          MathUtil.copyDirectionPow(-leftSpeed.get(), 2) * speedMultipliers :
+          MathUtil.copyDirectionPow(-rightSpeed.get(), 2) * speedMultipliers :
           MathUtil.copyDirectionPow(leftSpeed.get(), 2) * speedMultipliers);
       } else {
-        tankFRMotor.set(isReversed ? -rightSpeed.get() * speedMultipliers : rightSpeed.get() * speedMultipliers);
-        tankFLMotor.set(isReversed ? -leftSpeed.get() * speedMultipliers : leftSpeed.get() * speedMultipliers);
+        tankFRMotor.set(isReversed ? -1 * leftSpeed.get() * speedMultipliers : rightSpeed.get() * speedMultipliers);
+        tankFLMotor.set(isReversed ? -1 * rightSpeed.get() * speedMultipliers : leftSpeed.get() * speedMultipliers);
       }
+      SmartDashboard.putNumber("rightSpeed", rightSpeed.get());
+      SmartDashboard.putNumber("leftSpeed", leftSpeed.get());
     });
 
     return driveCommand;
   }
 
 
-  public Command flipsDriveCommand() {return run(() -> isReversed = !isReversed);}
+  public Command flipsDriveCommand() {return runOnce(() -> isReversed = !isReversed);}
 
 
   

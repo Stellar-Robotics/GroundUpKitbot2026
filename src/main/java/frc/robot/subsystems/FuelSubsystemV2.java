@@ -52,13 +52,13 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
     // Configure motor configs
     intakeSparkConf
-      .smartCurrentLimit(MotorConstants.currentLimit)
+      .smartCurrentLimit(MotorConstants.weakCurrentLimit)
       .inverted(false);
     feederSparkConf
-      .smartCurrentLimit(MotorConstants.currentLimit)
+      .smartCurrentLimit(MotorConstants.strongCurrentLimit)
       .inverted(true);
     launcherFlexConf
-      .smartCurrentLimit(MotorConstants.currentLimit)
+      .smartCurrentLimit(MotorConstants.strongCurrentLimit)
       .inverted(true)
       .closedLoop.pid(0.0025, 0, 0.0025);
 
