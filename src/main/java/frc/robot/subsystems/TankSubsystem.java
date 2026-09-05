@@ -57,7 +57,7 @@ public class TankSubsystem extends SubsystemBase {
   DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(25));
   DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
     kinematics, 
-    Rotation2d.fromDegrees(Math.IEEEremainder(gyro.getAngle() + 90, 360)), 
+    Rotation2d.fromDegrees(Math.IEEEremainder(gyro.getAngle() - 90, 360)), 
     -tankFLMotor.getEncoder().getPosition(), 
     -tankFRMotor.getEncoder().getPosition(), 
     new Pose2d(0, 5, Rotation2d.fromDegrees(0))
@@ -98,10 +98,10 @@ public class TankSubsystem extends SubsystemBase {
       .velocityConversionFactor(1 / 8.46);
     tankFRMotorConfig.encoder.positionConversionFactor(1 / tankConstants.RotationsInAMeter)
       .velocityConversionFactor(1 / 8.46);
-    tankFLMotorConfig.closedLoop.pid(0.0002, 0.000001, 0.015);
-    tankFRMotorConfig.closedLoop.pid(0.0002, 0.000001, 0.015);
-    tankFRMotorConfig.closedLoop.feedForward.kV(0.002);
-    tankFLMotorConfig.closedLoop.feedForward.kV(0.002);
+    tankFLMotorConfig.closedLoop.pid(0.001, 0, 0);
+    tankFRMotorConfig.closedLoop.pid(0.001, 0, 0);
+    tankFRMotorConfig.closedLoop.feedForward.kV(0.018);
+    tankFLMotorConfig.closedLoop.feedForward.kV(0.018);
 
     tankBLMotor.configure(tankBLMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     tankBRMotor.configure(tankBRMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -132,8 +132,11 @@ public class TankSubsystem extends SubsystemBase {
 
     DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeedSupplier);
 
-    frontLeftCLC.setSetpoint(wheelSpeeds.leftMetersPerSecond, ControlType.kVelocity);
-    frontRightCLC.setSetpoint(wheelSpeeds.rightMetersPerSecond, ControlType.kVelocity);
+    var leftRPM = (-wheelSpeeds.leftMetersPerSecond * 60) / (Math.PI * 0.018);
+    var rightRPM = (-wheelSpeeds.rightMetersPerSecond * 60) / (Math.PI * 0.018);
+
+    frontLeftCLC.setSetpoint(leftRPM, ControlType.kVelocity);
+    frontRightCLC.setSetpoint(rightRPM, ControlType.kVelocity);
   }
 
 
@@ -310,7 +313,7 @@ public class TankSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     poseEstimator.update(
-      Rotation2d.fromDegrees(gyro.getAngle()), 
+      Rotation2d.fromDegrees(Math.IEEEremainder(gyro.getAngle() - 90, 360)), 
       -tankFLMotor.getEncoder().getPosition(), 
       -tankFRMotor.getEncoder().getPosition()
     );
