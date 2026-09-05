@@ -132,8 +132,11 @@ public class TankSubsystem extends SubsystemBase {
 
     DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeedSupplier);
 
-    var leftRPM = (-wheelSpeeds.leftMetersPerSecond * 60) / (Math.PI * 0.018);
-    var rightRPM = (-wheelSpeeds.rightMetersPerSecond * 60) / (Math.PI * 0.018);
+    // var leftRPM = (-wheelSpeeds.leftMetersPerSecond * 60) / (Math.PI * 0.018);
+    // var rightRPM = (-wheelSpeeds.rightMetersPerSecond * 60) / (Math.PI * 0.018);
+
+    var leftRPM = (-wheelSpeeds.leftMetersPerSecond * 60) / (Math.PI * 0.152);
+    var rightRPM = (-wheelSpeeds.rightMetersPerSecond * 60) / (Math.PI * 0.152);
 
     frontLeftCLC.setSetpoint(leftRPM, ControlType.kVelocity);
     frontRightCLC.setSetpoint(rightRPM, ControlType.kVelocity);
@@ -226,6 +229,11 @@ public class TankSubsystem extends SubsystemBase {
 
 
   public Command flipsDriveCommand() {return runOnce(() -> isReversed = !isReversed);}
+
+  public Command resetPose() {return runOnce(() -> poseEstimator.resetPose(new Pose2d(
+    poseEstimator.getEstimatedPosition().getX(), 
+    poseEstimator.getEstimatedPosition().getY(), 
+    poseEstimator.getEstimatedPosition().getRotation())));}
 
 
   

@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.677,
+        "x": 2.8935662650602403,
         "y": 4.016
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.926557774607703,
-        "y": 4.016
+        "x": 2.2706867469879506,
+        "y": 4.068191121117852
       },
       "isLocked": false,
-      "linkedName": "centerStartingPoint"
+      "linkedName": "centerShootPoint"
     },
     {
       "anchor": {
-        "x": 2.8935662650602403,
-        "y": 4.016
+        "x": 1.64780722891087,
+        "y": 4.723445783129745
       },
       "prevControl": {
-        "x": 3.1435662650602403,
-        "y": 4.016
+        "x": 1.8888998493939957,
+        "y": 4.491078963140066
+      },
+      "nextControl": {
+        "x": 1.4067146084277444,
+        "y": 4.955812603119424
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.4676144578265332,
+        "y": 4.920144578310468
+      },
+      "prevControl": {
+        "x": 1.079566265055449,
+        "y": 4.9310722891538425
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "centerShootPoint"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -45,7 +61,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "startToShootPaths",
+  "folder": "shootToEscape",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

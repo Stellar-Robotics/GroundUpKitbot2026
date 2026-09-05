@@ -15,11 +15,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.TankSubsystem;
+import frc.robot.Constants.MechanismConstants;
+import frc.robot.Constants.tankConstants;
 import frc.robot.subsystems.FuelSubsystemV2;
 
 
@@ -77,6 +80,8 @@ public class RobotContainer {
     // Expel fuel
     operatorController.pov(180).whileTrue(fuelSubsystem.expelCommand());
 
+    operatorController.y().onTrue(driveSubsystem.resetPose());
+
     // Invert drivetrain
     leftJoystick.button(9).onTrue(driveSubsystem.flipsDriveCommand());
 
@@ -113,6 +118,9 @@ public class RobotContainer {
 
       autoCommands.put("shootingCommand", fuelSubsystem.spinUpAndLaunchCommand());
       autoCommands.put("intakeCommand", fuelSubsystem.intakeCommand());
+      autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(2700)));
+      autoCommands.put("shootCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setFeeder(0.55)));
+      autoCommands.put("intakeCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setIntake(MechanismConstants.intakeSpeedPercentage)));
       
       NamedCommands.registerCommands(autoCommands);
   }

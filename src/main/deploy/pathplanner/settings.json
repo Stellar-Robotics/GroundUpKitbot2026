@@ -3,6 +3,7 @@
   "robotLength": 0.66675,
   "holonomicMode": false,
   "pathFolders": [
+    "shootToEscape",
     "escapeAutos",
     "startToShootPaths"
   ],
@@ -18,11 +19,11 @@
   "robotMass": 74.088,
   "robotMOI": 6.883,
   "robotTrackwidth": 0.635,
-  "driveWheelRadius": 0.0762,
+  "driveWheelRadius": 0.076,
   "driveGearing": 8.46,
   "maxDriveSpeed": 5.45,
   "driveMotorType": "NEO",
-  "driveCurrentLimit": 40.0,
+  "driveCurrentLimit": 30.0,
   "wheelCOF": 1.2,
   "flModuleX": 0.273,
   "flModuleY": 0.273,
