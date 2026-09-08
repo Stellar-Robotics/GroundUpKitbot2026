@@ -46,6 +46,7 @@ public final class Constants {
     public static final double feedSpeedPercentage = 0.75;
     public static final int shootSpeedRPM = 2700;
     public static final double spinUpTimeSeconds = 2;
+    public static final double intakeVelocity = 200;
   }
 
   

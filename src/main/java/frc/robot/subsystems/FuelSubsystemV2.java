@@ -35,6 +35,8 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
   // Get launcher motor CLC for percision speed control
   private SparkClosedLoopController launcherCLC = launcherFlex.getClosedLoopController();
+  private SparkClosedLoopController feederCLC = feederSpark.getClosedLoopController();
+  private SparkClosedLoopController intakeCLC = intakeSpark.getClosedLoopController();
 
   // Set intake speed
   // private double intakeSpeedPercentage = 0.5;
@@ -88,6 +90,11 @@ public class FuelSubsystemV2 extends SubsystemBase {
     feederSpark.set(-speedPercentage);
   }
 
+  public void setIntakeRPM(double velocity) {
+    intakeCLC.setSetpoint(velocity, ControlType.kVelocity);
+    feederCLC.setSetpoint(-velocity * 2, ControlType.kVelocity);
+  }
+
 
   // Spin's shooter up to desired speed
   public void setShooterRPM(int speedRPM) {
@@ -100,6 +107,8 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
   // Set feeder at desired speed
   public void setFeeder( double speedPercentage) { feederSpark.set(speedPercentage); }
+
+  public void setFeederRPM(double velocity) {feederCLC.setSetpoint(velocity * 2, ControlType.kVelocity);}
 
   
   @Override
@@ -115,15 +124,22 @@ public class FuelSubsystemV2 extends SubsystemBase {
   // Intake and expel commands at preset speed
   public Command intakeCommand() {
     return runEnd(
-      () -> setIntake(MechanismConstants.intakeSpeedPercentage), 
-      () -> setIntake(0)
+      () -> setIntakeRPM(MechanismConstants.intakeVelocity), 
+      () -> setIntakeRPM(0)
+    // return runEnd(
+    //   () -> setIntake(MechanismConstants.intakeSpeedPercentage), 
+    //   () -> setIntake(0)
     ).withName("IntakeFuel");
   }
 
+
   public Command expelCommand() {
     return runEnd(
-      () -> setIntake(-MechanismConstants.intakeSpeedPercentage),
-      () -> setIntake(0)
+      () -> setIntakeRPM(MechanismConstants.intakeVelocity), 
+      () -> setIntake(MechanismConstants.intakeVelocity)
+    // return runEnd(
+    //   () -> setIntake(-MechanismConstants.intakeSpeedPercentage),
+    //   () -> setIntake(0)
     ).withName("ExpelFuel");
   }
 
@@ -133,17 +149,17 @@ public class FuelSubsystemV2 extends SubsystemBase {
     // Build a command composition
     Command com = new SequentialCommandGroup(
       runOnce(() -> setShooterRPM(MechanismConstants.shootSpeedRPM)), // Spin up
-      runOnce(() -> setFeeder(-MechanismConstants.feedSpeedPercentage)), // Run feeder backwards initally
-      runOnce(() -> setIntake(MechanismConstants.feedSpeedPercentage)), // Run intake to prevent fuel from leaving
+      runOnce(() -> setFeederRPM(-MechanismConstants.intakeVelocity)), // Run feeder backwards initally
+      runOnce(() -> setIntakeRPM(MechanismConstants.intakeVelocity)), // Run intake to prevent fuel from leaving
       new WaitCommand(MechanismConstants.spinUpTimeSeconds), // Wait for certin time
-      runOnce(() -> setFeeder(MechanismConstants.feedSpeedPercentage)), // Run feeder forwards
+      runOnce(() -> setFeederRPM(MechanismConstants.intakeVelocity)), // Run feeder forwards
       new WaitUntilCommand(() -> false)
     )
     .handleInterrupt(() -> {
       // Stop shooter and feeder when inturrupted
       setShooterRPM(0);
-      setFeeder(0);
-      setIntake(0);
+      setFeederRPM(0);
+      setIntakeRPM(0);
     })
     .withName("SpinUpAndLaunch");
 
