@@ -22,7 +22,7 @@ public final class Constants {
 
   public static class MotorConstants {
     public static final int weakCurrentLimit = 30;
-    public static final int strongCurrentLimit = 50;
+    public static final int strongCurrentLimit = 40;
     public static final int bLCanID = 33;
     public static final int fRCanID = 31;
     public static final int fLCanID = 32;
@@ -43,10 +43,10 @@ public final class Constants {
 
   public static class MechanismConstants {
     public static final double intakeSpeedPercentage = 0.75;
-    public static final double feedSpeedPercentage = 0.75;
-    public static final int shootSpeedRPM = 2700;
+    public static final double feedSpeedPercentage = 1;
+    public static final int shootSpeedRPM = 3200;
     public static final double spinUpTimeSeconds = 2;
-    public static final double intakeVelocity = 200;
+    public static final double intakeVelocity = 1600;
   }
 
   

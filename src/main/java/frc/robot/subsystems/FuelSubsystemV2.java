@@ -54,7 +54,7 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
     // Configure motor configs
     intakeSparkConf
-      .smartCurrentLimit(MotorConstants.weakCurrentLimit)
+      .smartCurrentLimit(MotorConstants.strongCurrentLimit)
       .inverted(false)
       .closedLoop.pid(0.0005, 0, 0.001);
     feederSparkConf
@@ -63,7 +63,7 @@ public class FuelSubsystemV2 extends SubsystemBase {
       .closedLoop.pid(0.0003, 0.000001, 0)
       .feedForward.kV(0.004);
     launcherFlexConf
-      .smartCurrentLimit(MotorConstants.strongCurrentLimit)
+      .smartCurrentLimit(50)
       .inverted(true)
       .closedLoop.pid(0.0025, 0, 0.0025);
 
@@ -100,7 +100,8 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
 
   // Spin's shooter up to desired speed
-  public void setShooterRPM(int speedRPM) {
+  public void 
+  setShooterRPM(int speedRPM) {
     launcherCLC.setSetpoint(
       MathUtil.clamp(speedRPM, 0, 4000),
       ControlType.kVelocity
@@ -127,8 +128,8 @@ public class FuelSubsystemV2 extends SubsystemBase {
   // Intake and expel commands at preset speed
   public Command intakeCommand() {
     return runEnd(
-      () -> setIntakeRPM(MechanismConstants.intakeVelocity), 
-      () -> setIntakeRPM(0)
+      () -> setIntake(MechanismConstants.intakeSpeedPercentage), 
+      () -> setIntake(0)
     // return runEnd(
     //   () -> setIntake(MechanismConstants.intakeSpeedPercentage), 
     //   () -> setIntake(0)
@@ -138,8 +139,9 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
   public Command expelCommand() {
     return runEnd(
-      () -> setIntakeRPM(MechanismConstants.intakeVelocity), 
-      () -> setIntake(MechanismConstants.intakeVelocity)
+      () -> setIntake(-
+      MechanismConstants.intakeSpeedPercentage), 
+      () -> setIntake(0)
     // return runEnd(
     //   () -> setIntake(-MechanismConstants.intakeSpeedPercentage),
     //   () -> setIntake(0)
