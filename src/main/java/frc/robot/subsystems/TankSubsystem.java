@@ -79,17 +79,17 @@ public class TankSubsystem extends SubsystemBase {
     SparkMaxConfig tankBLMotorConfig = new SparkMaxConfig();
     SparkMaxConfig tankBRMotorConfig = new SparkMaxConfig();
 
-    tankFLMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
+    tankFLMotorConfig.smartCurrentLimit(MotorConstants.strongCurrentLimit)
       .inverted(true)
       .idleMode(IdleMode.kBrake);
-    tankFRMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
+    tankFRMotorConfig.smartCurrentLimit(MotorConstants.strongCurrentLimit)
       .inverted(false)
       .idleMode(IdleMode.kBrake);
-    tankBLMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
+    tankBLMotorConfig.smartCurrentLimit(MotorConstants.strongCurrentLimit)
       .inverted(true)
       .follow(MotorConstants.fLCanID)
       .idleMode(IdleMode.kBrake);
-    tankBRMotorConfig.smartCurrentLimit(MotorConstants.weakCurrentLimit)
+    tankBRMotorConfig.smartCurrentLimit(MotorConstants.strongCurrentLimit)
       .inverted(false)
       .follow(MotorConstants.fRCanID)
       .idleMode(IdleMode.kBrake);

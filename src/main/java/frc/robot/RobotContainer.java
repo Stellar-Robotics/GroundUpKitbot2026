@@ -94,7 +94,7 @@ public class RobotContainer {
       driveSubsystem.driveTank(
         () -> MathUtil.applyDeadband(drivingController.getLeftY(), .05), 
         () -> MathUtil.applyDeadband(drivingController.getRightY(), .05), 
-        true, 
+        false, 
         false
       )
     );
