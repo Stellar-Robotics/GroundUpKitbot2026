@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -37,10 +36,12 @@ public class RobotContainer {
   TankSubsystem driveSubsystem = new TankSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  CommandJoystick leftJoystick = new CommandJoystick(0);
-  CommandJoystick righJoystick = new CommandJoystick(1);
-  CommandXboxController operatorController = new CommandXboxController(2);
-  CommandPS4Controller drivingController = new CommandPS4Controller(3);
+
+  // CommandJoystick leftJoystick = new CommandJoystick(0);
+  // CommandJoystick righJoystick = new CommandJoystick(1);
+
+  CommandXboxController operatorController = new CommandXboxController(1);
+  CommandPS4Controller drivingController = new CommandPS4Controller(0);
 
   // Selector for autonomous
   SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -81,7 +82,7 @@ public class RobotContainer {
     operatorController.y().onTrue(driveSubsystem.resetPose());
 
     // Invert drivetrain
-    leftJoystick.button(9).onTrue(driveSubsystem.flipsDriveCommand());
+    //leftJoystick.button(9).onTrue(driveSubsystem.flipsDriveCommand());
 
     //leftJoystick.button(7).onTrue(driveSubsystem.testOdometry());
 
