@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -79,6 +80,8 @@ public class RobotContainer {
     // Expel fuel
     operatorController.pov(180).whileTrue(fuelSubsystem.expelCommand());
 
+    operatorController.y().onTrue(fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(0)));
+
     operatorController.y().onTrue(driveSubsystem.resetPose());
 
     // Invert drivetrain
@@ -117,9 +120,10 @@ public class RobotContainer {
 
       autoCommands.put("shootingCommand", fuelSubsystem.spinUpAndLaunchCommand());
       autoCommands.put("intakeCommand", fuelSubsystem.intakeCommand());
-      autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(2700)));
-      autoCommands.put("shootCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setFeederRPM(MechanismConstants.intakeVelocity)));
+      autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(2750)));
+      autoCommands.put("shootCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setFeederRPM(900)));
       autoCommands.put("intakeCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setIntakeRPM(MechanismConstants.intakeVelocity)));
+      autoCommands.put("StopShootingCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.stopEverything()));
       
       NamedCommands.registerCommands(autoCommands);
   }
@@ -132,6 +136,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     //return driveSubsystem.testOdometry();
-    return autoChooser.getSelected();
+    return autoChooser.getSelected().handleInterrupt(() -> fuelSubsystem.stopEverything());
   }
 }

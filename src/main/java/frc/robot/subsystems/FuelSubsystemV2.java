@@ -54,7 +54,7 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
     // Configure motor configs
     intakeSparkConf
-      .smartCurrentLimit(MotorConstants.strongCurrentLimit)
+      .smartCurrentLimit(60)
       .inverted(false)
       .closedLoop.pid(0.0005, 0, 0.001);
     feederSparkConf
@@ -113,6 +113,12 @@ public class FuelSubsystemV2 extends SubsystemBase {
   public void setFeeder( double speedPercentage) { feederSpark.set(speedPercentage); }
 
   public void setFeederRPM(double velocity) {feederCLC.setSetpoint(velocity * 2, ControlType.kVelocity);}
+
+  public void stopEverything() {
+    setFeeder(0);
+    setIntake(0);
+    setShooterRPM(0);
+  }
 
   
   @Override

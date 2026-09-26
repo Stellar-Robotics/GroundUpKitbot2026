@@ -49,7 +49,8 @@ public class TankSubsystem extends SubsystemBase {
   SparkMax tankBRMotor = new SparkMax(MotorConstants.bRCanID, MotorType.kBrushless);
 
   // Create closed loop controller refrences
-  SparkClosedLoopController frontLeftCLC = tankFLMotor.getClosedLoopController();
+  SparkClosedLoopController 
+  frontLeftCLC = tankFLMotor.getClosedLoopController();
   SparkClosedLoopController frontRightCLC = tankFRMotor.getClosedLoopController();
 
   // Robot sensing object definition
