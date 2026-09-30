@@ -63,7 +63,7 @@ public class FuelSubsystemV2 extends SubsystemBase {
       .closedLoop.pid(0.0003, 0.000001, 0)
       .feedForward.kV(0.004);
     launcherFlexConf
-      .smartCurrentLimit(50)
+      .smartCurrentLimit(60)
       .inverted(true)
       .closedLoop.pid(0.0025, 0, 0.0025);
 
@@ -156,11 +156,11 @@ public class FuelSubsystemV2 extends SubsystemBase {
 
 
   // Primary command for spinning up and launching fuel
-  public Command spinUpAndLaunchCommand() {
+  public Command spinUpAndLaunchCommand(int shooterSpeedRPM) {
     // Build a command composition
     Command com = new SequentialCommandGroup(
-      runOnce(() -> setShooterRPM(MechanismConstants.shootSpeedRPM)), // Spin up
-      runOnce(() -> setFeederRPM(-MechanismConstants.intakeVelocity)), // Run feeder backwards initally
+      runOnce(() -> setShooterRPM(shooterSpeedRPM)), // Spin up
+      runOnce(() -> setFeederRPM(-MechanismConstants.intakeVelocity / 1.5)), // Run feeder backwards initally
       runOnce(() -> setIntakeRPM(MechanismConstants.intakeVelocity)), // Run intake to prevent fuel from leaving
       new WaitCommand(MechanismConstants.spinUpTimeSeconds), // Wait for certin time
       runOnce(() -> setFeederRPM(MechanismConstants.intakeVelocity)), // Run feeder forwards

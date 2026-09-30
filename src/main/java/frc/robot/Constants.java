@@ -44,7 +44,8 @@ public final class Constants {
   public static class MechanismConstants {
     public static final double intakeSpeedPercentage = 1;
     public static final double feedSpeedPercentage = 1;
-    public static final int shootSpeedRPM = 3200;
+    public static final int shootCloseSpeedRPM = 2800;
+    public static final int shootFarSpeedRPM = 3050;
     public static final double spinUpTimeSeconds = 2;
     public static final double intakeVelocity = 1600;
   }

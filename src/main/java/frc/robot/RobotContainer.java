@@ -73,7 +73,9 @@ public class RobotContainer {
   private void configureBindings() {
 
     // Spin up and launch
-    operatorController.rightTrigger().whileTrue(fuelSubsystem.spinUpAndLaunchCommand());
+    operatorController.rightTrigger().whileTrue(fuelSubsystem.spinUpAndLaunchCommand(MechanismConstants.shootFarSpeedRPM));
+
+    operatorController.leftTrigger().whileTrue(fuelSubsystem.spinUpAndLaunchCommand(MechanismConstants.shootCloseSpeedRPM));
     // Intake fuel
     operatorController.pov(0).whileTrue(fuelSubsystem.intakeCommand());
     // Expel fuel
@@ -117,10 +119,10 @@ public class RobotContainer {
   public void initPathplanner() {
     Map<String, Command> autoCommands = new HashMap<>();
 
-      autoCommands.put("shootingCommand", fuelSubsystem.spinUpAndLaunchCommand());
+      autoCommands.put("shootingCommand", fuelSubsystem.spinUpAndLaunchCommand(MechanismConstants.shootFarSpeedRPM));
       autoCommands.put("intakeCommand", fuelSubsystem.intakeCommand());
-      autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(2750)));
-      autoCommands.put("shootCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setFeederRPM(900)));
+      autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(2850)));
+      autoCommands.put("shootCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setFeederRPM(1500)));
       autoCommands.put("intakeCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setIntakeRPM(MechanismConstants.intakeVelocity)));
       autoCommands.put("StopShootingCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.stopEverything()));
       
