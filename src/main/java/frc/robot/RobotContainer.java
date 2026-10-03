@@ -124,7 +124,7 @@ public class RobotContainer {
       autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(2850)));
       autoCommands.put("shootCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setFeederRPM(1500)));
       autoCommands.put("intakeCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setIntakeRPM(MechanismConstants.intakeVelocity)));
-      autoCommands.put("StopShootingCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.stopEverything()));
+      autoCommands.put("stopShootingCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.stopEverything()));
       
       NamedCommands.registerCommands(autoCommands);
   }
