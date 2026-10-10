@@ -3,13 +3,15 @@
   "robotLength": 0.66675,
   "holonomicMode": false,
   "pathFolders": [
-    "shootToEscape",
+    "sweepingPath",
     "escapeAutos",
+    "shootToEscape",
     "startToShootPaths"
   ],
   "autoFolders": [
-    "escapeAutos",
-    "ShootingAutos"
+    "sweep",
+    "ShootingAutos",
+    "escapeAutos"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

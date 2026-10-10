@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "leftStartingSweep (1)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "leftFuelApproach (2)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "spinupCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "leftFuelToBump (3)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootCommand"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "leftShootToEscapePath"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "sweep",
+  "choreoAuto": false
+}

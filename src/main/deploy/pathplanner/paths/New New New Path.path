@@ -1,0 +1,145 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.0,
+        "y": 0.5709156626506025
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.625493975903614,
+        "y": 0.6364819277108438
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.095156626506025,
+        "y": 2.0898674698795183
+      },
+      "prevControl": {
+        "x": 8.029590361445782,
+        "y": 1.0735903614457833
+      },
+      "nextControl": {
+        "x": 8.16630228901358,
+        "y": 3.1926252387465732
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.751048192771829,
+        "y": 2.931301204822439
+      },
+      "prevControl": {
+        "x": 7.155373493976646,
+        "y": 2.8875903614489444
+      },
+      "nextControl": {
+        "x": 6.346722891567011,
+        "y": 2.9750120481959335
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.450650602410385,
+        "y": 2.62532530120798
+      },
+      "prevControl": {
+        "x": 5.99703614457906,
+        "y": 2.581614457834487
+      },
+      "nextControl": {
+        "x": 4.855614536015468,
+        "y": 2.6729281865195724
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.243253012048939,
+        "y": 2.242855421689908
+      },
+      "prevControl": {
+        "x": 3.5695203908032562,
+        "y": 2.2307714446955114
+      },
+      "nextControl": {
+        "x": 2.9482048192778563,
+        "y": 2.2537831325364426
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.691518072289902,
+        "y": 2.62532530120798
+      },
+      "prevControl": {
+        "x": 4.193963855422433,
+        "y": 3.729024096388704
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "LeftBackuptoHub"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 3.8003992015967993,
+      "maxWaypointRelativePos": 4.375249500997998,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "intakeCommand",
+      "waypointRelativePos": 0.13572854291418318,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "spinupCommand",
+      "waypointRelativePos": 2.355289421157708,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "sweepingPath",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}

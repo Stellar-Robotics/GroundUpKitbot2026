@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "spinupCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightStartingSweepPath"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootCommand"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "rightShootToEscapePath"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "sweep",
+  "choreoAuto": false
+}
