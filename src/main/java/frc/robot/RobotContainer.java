@@ -104,16 +104,6 @@ public class RobotContainer {
       )
     );
 
-      
-
-
-
-    // Robot barrier restriction (NULL POINTER CRASH 8/24/26)
-    // double xRestriction = SmartDashboard.getNumber("WidthRestrictionsInMeters", 2.7432);
-    // double yRestriction = SmartDashboard.getNumber("lengthRestrictionsInMeters", 2.7432);
-    //   if(SmartDashboard.getBoolean("EnableBoundries", false)) {
-    //     //zoomZoom.boundries(xRestriction, yRestriction);
-    //   }
   }
 
   public void initPathplanner() {
@@ -121,7 +111,7 @@ public class RobotContainer {
 
       autoCommands.put("shootingCommand", fuelSubsystem.spinUpAndLaunchCommand(MechanismConstants.shootFarSpeedRPM));
       autoCommands.put("intakeCommand", fuelSubsystem.intakeCommand());
-      autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(2950)));
+      autoCommands.put("spinupCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setShooterRPM(3075)));
       autoCommands.put("shootCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setFeederRPM(1500)));
       autoCommands.put("intakeCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.setIntakeRPM(MechanismConstants.intakeVelocity)));
       autoCommands.put("stopShootingCommand", fuelSubsystem.runOnce(() -> fuelSubsystem.stopEverything()));

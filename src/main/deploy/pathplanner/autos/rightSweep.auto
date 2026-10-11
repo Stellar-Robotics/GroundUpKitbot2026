@@ -5,6 +5,18 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "intakeCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "spinupCommand"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "New New New Path"
@@ -32,12 +44,6 @@
           "type": "named",
           "data": {
             "name": "stopShootingCommand"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "rightShootToEscapePath"
           }
         }
       ]
